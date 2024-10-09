@@ -10,12 +10,29 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-Our research Statement:
-"As a sociology student, I am interested in exploring the relationship between family wealth, gender and GPA. These variables enable us to discover questions like whether richer family would have better education resources, leading the wealthy kids' future success, or is certain gender more likely to gain higher GPA etc. This could potentially provide insights on some broad sociological topics like education inequality, gender inequality."
+Introduction
+This dataset focuses on school performances scores across various U.S. states from 2005 to 2015. This dataset provides us with potential insights on understanding the educational landscape in the United States. It includes some interesting variables such as graduation rates, test scores, teacher statistics, student-teacher ratios, gender ratios, family income and many other factors that could impact the school performance (measured by GPA).
+
+This analysis is motivated by a need to investigate the disparities and inequalities in educational outcomes across different regions and demographics. Through exploring the potential relationships between variables mentioned above, we want to discover some pattern that might highlight areas in need of education policy intervention. By evaluating the extent to which these resources correlate with students’ academic success, the educational stakeholders could also gain some data-driven insights for improving public education. 
+
+We chose this dataset because we are fully aware that education is the foundation of personal and societal progress as college students. Many of the issues college students face, like unequal access to quality education, educational funding, and achievement gaps, begin in the K-12 system. This dataset also fits into our academic interests. Because it offers a unique opportunity to combine our data analytical skills and interest in social sciences. 
+
+```{r}
+#Load the dataset
+score<-read.csv("data/school_scores.csv")
+```
 
 ```{r, echo=false}
-score<-read.csv("school_scores.csv")
+#Inspect the dataset
 head(score)
+```
+```{r, echo=false}
+# Summary statistics of the dataset
+summary(score)
+```
+
+
+```{r, echo=false}
 gpa<-score$Academic.Subjects.Arts.Music.Average.GPA
 colum_names<-colnames(score)
 ```
