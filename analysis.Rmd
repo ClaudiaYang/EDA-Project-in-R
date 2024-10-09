@@ -33,6 +33,7 @@ summary(score)
 
 
 ```{r, echo=false}
+#Get GPA
 gpa<-score$Academic.Subjects.Arts.Music.Average.GPA
 colum_names<-colnames(score)
 ```
