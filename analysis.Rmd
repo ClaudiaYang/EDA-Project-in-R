@@ -1,0 +1,223 @@
+---
+title: "file1"
+author: "KarlZhou"
+date: "2024-10-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+Our research Statement:
+"As a sociology student, I am interested in exploring the relationship between family wealth, gender and GPA. These variables enable us to discover questions like whether richer family would have better education resources, leading the wealthy kids' future success, or is certain gender more likely to gain higher GPA etc. This could potentially provide insights on some broad sociological topics like education inequality, gender inequality."
+
+```{r, echo=false}
+score<-read.csv("school_scores.csv")
+head(score)
+gpa<-score$Academic.Subjects.Arts.Music.Average.GPA
+colum_names<-colnames(score)
+```
+
+Part I: Describing and Breaking down Variables
+
+Our dataset "School_scores" has lots of information that can be categorized into several themes. 
+
+Theme 1: Demographic information
+The dataset contains basic demographic information that helps identify the year and the state in which the data was collected. These variables include:
+Year: The year the data was recorded.
+State.Code: Numeric or alphabetical codes assigned to states.
+State.Name: The full names of the states.
+
+```{r}
+demographic_vars <- c("Year", "State.Code", "State.Name")
+demographic_data <- score[, demographic_vars]
+print(demographic_data)
+```
+
+Theme 2: Test Scores
+Test scores represent one of the core components of our dataset. These variables include overall test scores, family income group test scores, and test scores based on GPA. Here are the main variables:
+
+Overall Test Scores: Total.Math, Total.Test.takers, Total.Verbal
+Family Income Brackets: Family.Income.Between.20.40k.Math, Family.Income.More.than.100k.Verbal
+GPA Test Scores: GPA.A.Math, GPA.C.Verbal, GPA.No.response.Math
+Gender-based Test Scores: Gender.Female.Math, Gender.Male.Verbal
+Score Ranges: These show performance in specific score ranges, such as Score.Ranges.Between.300.to.400.Math.Total.
+
+```{r}
+test_score_vars <- c("Total.Math", "Total.Test.takers", "Total.Verbal", 
+                     "Family.Income.Between.20.40k.Math", "GPA.A.Math", 
+                     "Gender.Female.Math", "Score.Ranges.Between.300.to.400.Math.Total")
+test_score_data <- score[, test_score_vars]
+print(test_score_data)
+```
+
+Theme 3: Academic Performance in Subjects
+Our dataset also provides information on GPA and the number of years spent studying different subjects. The subjects include arts, English, foreign languages, mathematics, and natural sciences. Each subject has two variables:
+
+Average GPA: For example, Academic.Subjects.English.Average.GPA.
+Average Years of Study: For example, Academic.Subjects.English.Average.Years.
+R Code to display Academic Performance Variables
+
+```{r}
+academic_vars <- c("Academic.Subjects.Arts.Music.Average.GPA", 
+                   "Academic.Subjects.English.Average.GPA",
+                   "Academic.Subjects.Mathematics.Average.GPA", 
+                   "Academic.Subjects.Natural.Sciences.Average.Years")
+academic_data <- score[, academic_vars]
+print(academic_data)
+```
+
+Theme 4. Family Income Groups
+Family income groups are crucial in understanding how socioeconomic factors influence student performance. Our dataset includes variables for different income brackets and their corresponding test scores:
+
+Family.Income.Between.20.40k.Math
+Family.Income.More.than.100k.Verbal
+Family.Income.Less.than.20k.Test.takers
+
+```{r}
+income_vars <- grep("Family.Income", colnames(score), value = TRUE)
+income_data <- score[, income_vars]
+print(income_data)
+```
+
+Theme 5: GPA-based Breakdown
+Our dataset provides a breakdown of test scores based on GPA ranges. Students are categorized into groups based on their GPA, ranging from A+ to D or lower. This allows for analysis of how students in different GPA ranges perform on standardized tests:
+
+GPA.A.Math
+GPA.B.Verbal
+GPA.D.or.lower.Math
+
+```{r}
+gpa_vars <- grep("GPA", colnames(score), value = TRUE)
+gpa_data <- score[, gpa_vars]
+print(gpa_data)
+```
+
+
+Part II: Some Simple Analysis and Visualizations
+(Variable太多，我暂时只挑了一小部分做图)
+
+Visualization
+
+```{r}
+gpa_math_data <- data.frame(
+  GPA = c("A+", "A", "A-", "B", "C", "D or lower"),
+  Math_Scores = c(mean(score$GPA.A.plus.Math, na.rm = TRUE), 
+                  mean(score$GPA.A.Math, na.rm = TRUE), 
+                  mean(score$GPA.A.minus.Math, na.rm = TRUE),
+                  mean(score$GPA.B.Math, na.rm = TRUE),
+                  mean(score$GPA.C.Math, na.rm = TRUE),
+                  mean(score$GPA.D.or.lower.Math, na.rm = TRUE))
+)
+
+barplot(gpa_math_data$Math_Scores, 
+        names.arg = gpa_math_data$GPA, 
+        main = "Average Math Scores by GPA Category", 
+        xlab = "GPA Category", 
+        ylab = "Math Scores")
+```
+```{r}
+income_takers <- c(sum(score$Family.Income.Less.than.20k.Test.takers, na.rm = TRUE),
+                   sum(score$Family.Income.Between.20.40k.Test.takers, na.rm = TRUE),
+                   sum(score$Family.Income.Between.40.60k.Test.takers, na.rm = TRUE),
+                   sum(score$Family.Income.More.than.100k.Test.takers, na.rm = TRUE))
+
+income_labels <- c("Less than 20k", "Between 20-40k", "Between 40-60k", "More than 100k")
+
+pie(income_takers, labels = income_labels, 
+    main = "Test Takers by Family Income Group")
+```
+```{r}
+#Average verbal scores across different GPA categories
+gpa_verbal_data <- data.frame(
+  GPA = c("A+", "A", "A-", "B", "C", "D or lower"),
+  Verbal_Scores = c(mean(score$GPA.A.plus.Verbal, na.rm = TRUE), 
+                    mean(score$GPA.A.Verbal, na.rm = TRUE), 
+                    mean(score$GPA.A.minus.Verbal, na.rm = TRUE),
+                    mean(score$GPA.B.Verbal, na.rm = TRUE),
+                    mean(score$GPA.C.Verbal, na.rm = TRUE),
+                    mean(score$GPA.D.or.lower.Verbal, na.rm = TRUE))
+)
+
+barplot(gpa_verbal_data$Verbal_Scores, 
+        names.arg = gpa_verbal_data$GPA, 
+        main = "Average Verbal Scores by GPA Category", 
+        xlab = "GPA Category", 
+        ylab = "Verbal Scores", 
+        col = "lightblue")
+
+
+```
+
+
+Boxplot of Math Scores by Family Income Bracket
+```{r}
+income_math_data <- score[, c("Family.Income.Less.than.20k.Math", 
+                              "Family.Income.Between.20.40k.Math",
+                              "Family.Income.Between.40.60k.Math",
+                              "Family.Income.More.than.100k.Math")]
+
+colnames(income_math_data) <- c("<20k", "20-40k", "40-60k", ">100k")
+
+boxplot(income_math_data, 
+        main = "Distribution of Math Scores by Family Income Bracket", 
+        xlab = "Family Income Bracket", 
+        ylab = "Math Scores", 
+        col = c("lightgreen", "lightblue", "lightcoral", "lightgoldenrod"))
+```
+Histogram of Total Math Scores
+```{r}
+hist(score$Total.Math, 
+     breaks = 20, 
+     main = "Histogram of Total Math Scores", 
+     xlab = "Math Scores", 
+     col = "lightcoral", 
+     border = "black")
+```
+Math Scores vs. Verbal Scores
+```{r}
+plot(score$Total.Math, score$Total.Verbal, 
+     main = "Math Scores vs. Verbal Scores", 
+     xlab = "Math Scores", 
+     ylab = "Verbal Scores", 
+     pch = 19, 
+     col = "blue")
+```
+Gender Breakdown of Test Takers
+```{r}
+gender_takers <- c(sum(score$Gender.Female.Test.takers, na.rm = TRUE), 
+                   sum(score$Gender.Male.Test.takers, na.rm = TRUE))
+
+gender_labels <- c("Female", "Male")
+
+pie(gender_takers, labels = gender_labels, 
+    main = "Test Takers by Gender", 
+    col = c("pink", "lightblue"))
+```
+Average Math Scores by Gender
+```{r}
+gender_math_avg <- c(mean(score$Gender.Female.Math, na.rm = TRUE), 
+                     mean(score$Gender.Male.Math, na.rm = TRUE))
+
+barplot(gender_math_avg, 
+        names.arg = c("Female", "Male"), 
+        main = "Average Math Scores by Gender", 
+        xlab = "Gender", 
+        ylab = "Average Math Scores", 
+        col = c("pink", "lightblue"))
+```
+
+```{r}
+score_numeric <- score[, c("Total.Math", "Total.Verbal", "Family.Income.Between.20.40k.Math", 
+                           "Family.Income.Between.20.40k.Verbal")]
+
+cor_matrix <- cor(score_numeric, use = "complete.obs")
+
+heatmap(cor_matrix, 
+        main = "Correlation Heatmap of Scores", 
+        col = heat.colors(256), 
+        symm = TRUE)
+```
+
