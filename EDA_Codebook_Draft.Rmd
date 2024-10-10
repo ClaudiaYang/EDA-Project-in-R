@@ -26,7 +26,9 @@ score<-read.csv("data/school_scores.csv")
 #Inspect the dataset
 head(score)
 ```
+
 Data Cleaning/Simplifying
+
 It is shown that there are 99 variables total in this dataset, which is too many for our analysis. After careful examination of the dataset, we decided to subset the dataset with the variables we think that are useful for our analysis. 
 ```{r}
 # Subset the dataset with relevant variables 
@@ -72,15 +74,9 @@ write_csv(score_subset, "data/school_scores_subset.csv")
 By the code above, we reduced the variables from 99 to 54, leaving the ones we think are potentially insightful only. 
 
 
-```{r, echo=false}
-#Get GPA
-gpa<-score_subset$Academic.Subjects.Arts.Music.Average.GPA
-colum_names<-colnames(score_subset)
-```
-
 Part I: Describing and Breaking down Variables
 
-Our dataset "School_scores" has lots of information that can be categorized into several themes. 
+In the dataset subseting section, we have catgetorized the 54 variables into four themes. We would now explore the four themes separately. 
 
 Theme 1: Demographic information
 The dataset contains basic demographic information that helps identify the year and the state in which the data was collected. These variables include:
@@ -155,9 +151,10 @@ print(gpa_data)
 
 
 Part II: Some Simple Analysis and Visualizations
-(Variable太多，我暂时只挑了一小部分做图)
 
 Visualization
+
+We calculated the mean math score for each GPA category and plotted it in a bar plot. This visualization shows how math scores are distributed across GPA categories, with each bar representing the average math score for a specific GPA range (from "A+" to "D or lower"). 
 
 ```{r}
 gpa_math_data <- data.frame(
@@ -176,6 +173,13 @@ barplot(gpa_math_data$Math_Scores,
         xlab = "GPA Category", 
         ylab = "Math Scores")
 ```
+
+We can observe a decreasing trend in the plot, indicating an association between GPA and math scores. 
+The students with an "A+" GPA have the highest average math scores, while those in the "D or lower" category have the lowest. This suggests that students with higher GPAs tend to perform better in SAT math, and there's a consistent drop in math scores as GPA decreases. 
+
+
+
+
 ```{r}
 income_takers <- c(sum(score_subset$Family.Income.Less.than.20k.Test.takers, na.rm = TRUE),
                    sum(score_subset$Family.Income.Between.20.40k.Test.takers, na.rm = TRUE),
@@ -187,6 +191,9 @@ income_labels <- c("Less than 20k", "Between 20-40k", "Between 40-60k", "More th
 pie(income_takers, labels = income_labels, 
     main = "Test Takers by Family Income Group")
 ```
+
+
+
 ```{r}
 #Average verbal scores across different GPA categories
 gpa_verbal_data <- data.frame(
