@@ -11,6 +11,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggplot2)
+library(dplyr)
+library(maps)
+library(scales)
 ```
 
 ## Introduction
@@ -26,7 +29,7 @@ We chose this dataset because we are fully aware that education is the foundatio
 score<-read.csv("data/school_scores.csv")
 ```
 
-```{r, echo=false}
+```{r}
 #Inspect the dataset
 head(score)
 ```
@@ -383,4 +386,26 @@ Math Scores: The p-value is smaller than 0.05, indicating a statistically signif
 
 Verbal Scores:The p-value (0.01266) is also smaller than 0.05, indicating a statistically significant difference between verbal scores for females and males. However, the difference is much smaller compared to math scores, with males scoring about 6.5 points higher than females on average.
 
+### Map 
+
+```{r}
+# Summarize the total test takers by state
+state_test_takers <- score_subset %>%
+  group_by(State.Code) %>%
+  summarise(total_takers = sum(Total.Test.takers, na.rm = TRUE))
+# Get U.S. states map data
+states_map <- map_data("state")
+# Convert state codes to lowercase for matching
+state_test_takers$region <- tolower(state.name[match(state_test_takers$State.Code, state.abb)])
+
+# Merge test takers data with the map data
+map_data_merged <- merge(states_map, state_test_takers, by = "region", all.x = TRUE)
+# Plot the map showing total test takers by state
+ggplot(data = map_data_merged, aes(x = long, y = lat, group = group, fill = total_takers)) +
+  geom_polygon(color = "black") +
+  scale_fill_continuous(name = "Total Test Takers", low = "lightblue", high = "darkblue", na.value = "grey50") +
+  theme_minimal() +
+  labs(title = "Total Test Takers by State") +
+  theme(legend.position = "bottom")
+```
 
