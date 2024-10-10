@@ -1,6 +1,6 @@
 ---
-title: "file1"
-author: "KarlZhou"
+title: "EDA Code Notebook Draft"
+author: "Group 5"
 date: "2024-10-03"
 output: html_document
 ---
