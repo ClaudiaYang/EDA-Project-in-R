@@ -2,7 +2,9 @@
 title: "EDA Code Notebook Draft"
 author: "Group 5"
 date: "2024-10-03"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -10,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-Introduction
+## Introduction
 This dataset focuses on school performances scores across various U.S. states from 2005 to 2015. This dataset provides us with potential insights on understanding the educational landscape in the United States. It includes some interesting variables such as graduation rates, test scores, teacher statistics, student-teacher ratios, gender ratios, family income and many other factors that could impact the school performance (measured by GPA).
 
 This analysis is motivated by a need to investigate the disparities and inequalities in educational outcomes across different regions and demographics. Through exploring the potential relationships between variables mentioned above, we want to discover some pattern that might highlight areas in need of education policy intervention. By evaluating the extent to which these resources correlate with students’ academic success, the educational stakeholders could also gain some data-driven insights for improving public education. 
@@ -27,7 +29,7 @@ score<-read.csv("data/school_scores.csv")
 head(score)
 ```
 
-Data Cleaning/Simplifying
+## Data Cleaning/Simplifying
 
 It is shown that there are 99 variables total in this dataset, which is too many for our analysis. After careful examination of the dataset, we decided to subset the dataset with the variables we think that are useful for our analysis. 
 ```{r}
@@ -74,11 +76,11 @@ write_csv(score_subset, "data/school_scores_subset.csv")
 By the code above, we reduced the variables from 99 to 54, leaving the ones we think are potentially insightful only. 
 
 
-Part I: Describing and Breaking down Variables
+## Part I: Describing and Breaking down Variables
 
 In the dataset subseting section, we have catgetorized the 54 variables into four themes. We would now explore the four themes separately. 
 
-Theme 1: Demographic information
+### Theme 1: Demographic information
 The dataset contains basic demographic information that helps identify the year and the state in which the data was collected. These variables include:
 Year: The year the data was recorded.
 State.Code: Numeric or alphabetical codes assigned to states.
@@ -90,7 +92,7 @@ demographic_data <- score_subset[, demographic_vars]
 print(demographic_data)
 ```
 
-Theme 2: Test Scores
+### Theme 2: Test Scores
 Test scores represent one of the core components of our dataset. These variables include overall test scores, family income group test scores, and test scores based on GPA. Here are the main variables:
 
 Overall Test Scores: Total.Math, Total.Test.takers, Total.Verbal
@@ -107,7 +109,7 @@ test_score_data <- score_subset[, test_score_vars]
 print(test_score_data)
 ```
 
-Theme 3: Academic Performance in Subjects
+### Theme 3: Academic Performance in Subjects
 Our dataset also provides information on GPA and the number of years spent studying different subjects. The subjects include arts, English, foreign languages, mathematics, and natural sciences. Each subject has two variables:
 
 Average GPA: For example, Academic.Subjects.English.Average.GPA.
@@ -123,7 +125,7 @@ academic_data <- score_subset[, academic_vars]
 print(academic_data)
 ```
 
-Theme 4. Family Income Groups
+### Theme 4. Family Income Groups
 Family income groups are crucial in understanding how socioeconomic factors influence student performance. Our dataset includes variables for different income brackets and their corresponding test scores:
 
 Family.Income.Between.20.40k.Math
@@ -136,7 +138,7 @@ income_data <- score_subset[, income_vars]
 print(income_data)
 ```
 
-Theme 5: GPA-based Breakdown
+### Theme 5: GPA-based Breakdown
 Our dataset provides a breakdown of test scores based on GPA ranges. Students are categorized into groups based on their GPA, ranging from A+ to D or lower. This allows for analysis of how students in different GPA ranges perform on standardized tests:
 
 GPA.A.Math
@@ -150,9 +152,9 @@ print(gpa_data)
 ```
 
 
-Part II: Some Simple Analysis and Visualizations
+## Part II: Some Simple Analysis and Visualizations
 
-Visualization
+### Visualization
 
 We calculated the mean math score for each GPA category and plotted it in a bar plot. This visualization shows how math scores are distributed across GPA categories, with each bar representing the average math score for a specific GPA range (from "A+" to "D or lower"). 
 
@@ -215,9 +217,13 @@ barplot(gpa_verbal_data$Verbal_Scores,
 
 
 ```
+We calculated the mean verbal score for each GPA category and plotted it in a bar plot. This visualization shows how verbal scores are distributed across GPA categories, with each bar representing the average verbal score for a specific GPA range (from "A+" to "D or lower").
+
+From this figure, we can observe a decreasing trend in average verbal scores as GPA decreases, suggesting a positive correlation between GPA and verbal performance.  Students with an "A+" GPA have the highest average verbal scores, while those in the "D or lower" category have the lowest.  This indicates that students with higher GPAs tend to perform better in verbal assessments, and there is a consistent decline in scores as the GPA drops.
 
 
-Boxplot of Math Scores by Family Income Bracket
+
+### Boxplot of Math Scores by Family Income Bracket
 ```{r}
 income_math_data <- score[, c("Family.Income.Less.than.20k.Math", 
                               "Family.Income.Between.20.40k.Math",
@@ -232,7 +238,7 @@ boxplot(income_math_data,
         ylab = "Math Scores", 
         col = c("lightgreen", "lightblue", "lightcoral", "lightgoldenrod"))
 ```
-Histogram of Total Math Scores
+### Histogram of Total Math Scores
 ```{r}
 hist(score$Total.Math, 
      breaks = 20, 
@@ -241,7 +247,11 @@ hist(score$Total.Math,
      col = "lightcoral", 
      border = "black")
 ```
-Math Scores vs. Verbal Scores
+We plotted a histogram of total math scores to understand the distribution of scores across the sample. The histogram shows how frequently different score ranges occur.
+
+From the histogram, we can observe that the total math scores are not evenly distributed, but rather concentrated around a central range. The peak, occurring around scores between 480 and 520, suggests that the majority of students achieved scores close to the average.  This central peak, along with a few lower and higher outliers, indicates that this histogram is a normal distribution, with a slight skew towards the higher end. Only a small portion of students scored below 450 or above 550.
+
+### Math Scores vs. Verbal Scores
 ```{r}
 plot(score$Total.Math, score$Total.Verbal, 
      main = "Math Scores vs. Verbal Scores", 
@@ -250,7 +260,8 @@ plot(score$Total.Math, score$Total.Verbal,
      pch = 19, 
      col = "blue")
 ```
-Gender Breakdown of Test Takers
+
+## Gender Breakdown of Test Takers
 ```{r}
 gender_takers <- c(sum(score$Gender.Female.Test.takers, na.rm = TRUE), 
                    sum(score$Gender.Male.Test.takers, na.rm = TRUE))
@@ -261,6 +272,9 @@ pie(gender_takers, labels = gender_labels,
     main = "Test Takers by Gender", 
     col = c("pink", "lightblue"))
 ```
+We plotted a pie chart to represent the distribution of test takers by gender. The chart is divided into two segments, each showing the proportion of male and female participants in the test. The segments are labeled "Female" and "Male," with pink and light blue colors respectively.   
+
+From the pie chart, we can observe that there are slightly more female test takers compared to male test takers. This difference need to be further analyzed, so we then plot another chart to analysis the score difference between "Female" and "Male".
 Average Math Scores by Gender
 ```{r}
 gender_math_avg <- c(mean(score_subset$Gender.Female.Math, na.rm = TRUE), 
