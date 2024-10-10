@@ -298,7 +298,7 @@ par(mfrow = c(1, 1))
 
 We observe that both math and verbal scores show some degree of deviation from a normal distribution, especially at the extremes. However, the data mostly follows a normal pattern, with only slight non-normality, especially at the higher ends.
 
-- We generated a scatter plot to visualize the relationship between math and verbal scores, with each point representing a student's performance in both areas. 
+To further explore this relationship, we generated a scatter plot to visualize the correlation between math and verbal scores. Each point on the graph represents an individual student's performance in both areas, offering a clearer view of how these two variables may interact. This visual representation helps highlight any patterns or outliers, allowing us to assess whether the non-normality at the extremes is reflected in the correlation between the two variables.
 
 ```{r}
 plot(score_subset$Total.Math, score_subset$Total.Verbal, 
@@ -387,19 +387,28 @@ Math Scores: The p-value is smaller than 0.05, indicating a statistically signif
 Verbal Scores:The p-value (0.01266) is also smaller than 0.05, indicating a statistically significant difference between verbal scores for females and males. However, the difference is much smaller compared to math scores, with males scoring about 6.5 points higher than females on average.
 
 ### Map 
+Next, we want to use a map to visualize the total number of test takers by state because it highlights regional disparities in test participation, helping to identify areas with low engagement with education. This visualization shows unequal resource allocation and informing policies that can improve access to testing. By visualizing this data, we can better understand where educational interventions are most needed to promote equity across states.
 
+Firstly, we would load the dataset,ensure the summarized data is correct before proceeding with map-related steps.
 ```{r}
 # Summarize the total test takers by state
 state_test_takers <- score_subset %>%
   group_by(State.Code) %>%
   summarise(total_takers = sum(Total.Test.takers, na.rm = TRUE))
+```
+
+Next, we would prepare the data ready to be put on a map by cleaning the dataset and merge by state names. 
+```{r}
 # Get U.S. states map data
 states_map <- map_data("state")
 # Convert state codes to lowercase for matching
 state_test_takers$region <- tolower(state.name[match(state_test_takers$State.Code, state.abb)])
-
 # Merge test takers data with the map data
 map_data_merged <- merge(states_map, state_test_takers, by = "region", all.x = TRUE)
+```
+
+Finally, we put the data on map. 
+```{r}
 # Plot the map showing total test takers by state
 ggplot(data = map_data_merged, aes(x = long, y = lat, group = group, fill = total_takers)) +
   geom_polygon(color = "black") +
@@ -408,4 +417,6 @@ ggplot(data = map_data_merged, aes(x = long, y = lat, group = group, fill = tota
   labs(title = "Total Test Takers by State") +
   theme(legend.position = "bottom")
 ```
+This map visualizes the total number of test takers by state, with a color scale indicating participation levels. Lighter shades of blue represent fewer test takers, while darker shades signify higher numbers. It shows that states like California and Texas are shown in darker blue, indicating a higher number of test takers, whereas less populous states such as Wyoming and Vermont appear in lighter blue, reflecting lower participation. The map reveals regional disparities, with higher test-taker concentrations in populous areas, particularly in the South and along the West Coast, while rural states tend to have fewer test takers. 
+
 
