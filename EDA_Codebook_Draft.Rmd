@@ -400,22 +400,36 @@ Next, we would prepare the data ready to be put on a map by cleaning the dataset
 ```{r}
 # Get U.S. states map data
 states_map <- map_data("state")
+
 # Convert state codes to lowercase for matching
 state_test_takers$region <- tolower(state.name[match(state_test_takers$State.Code, state.abb)])
-# Merge test takers data with the map data
-map_data_merged <- merge(states_map, state_test_takers, by = "region", all.x = TRUE)
+
+# Merge test takers data with the map data, making sure to keep 'group' column from states_map
+map_data_merged <- left_join(states_map, state_test_takers, by = "region")
+
+# Fill missing total_takers with 0 (or another value)
+map_data_merged$total_takers[is.na(map_data_merged$total_takers)] <- 0
+
+# Calculate centroids (average latitude and longitude) for each state
+state_centroids <- map_data_merged %>%
+  group_by(region) %>%
+  summarise(long = mean(long), lat = mean(lat))
+
+# Add the state abbreviations (State.Code) to the centroids data
+state_centroids$State.Code <- state_test_takers$State.Code[match(state_centroids$region, state_test_takers$region)]
 ```
 
 Finally, we put the data on map. 
 ```{r}
-# Plot the map showing total test takers by state
-ggplot(data = map_data_merged, aes(x = long, y = lat, group = group, fill = total_takers)) +
-  geom_polygon(color = "black") +
+# Plot the map with state abbreviations
+ggplot() +
+  geom_polygon(data = map_data_merged, aes(x = long, y = lat, group = group, fill = total_takers), color = "black") +
+  geom_text(data = state_centroids, aes(x = long, y = lat, label = State.Code), size = 3, color = "white") +
   scale_fill_continuous(name = "Total Test Takers", low = "lightblue", high = "darkblue", na.value = "grey50") +
   theme_minimal() +
   labs(title = "Total Test Takers by State") +
   theme(legend.position = "bottom")
+
 ```
-This map visualizes the total number of test takers by state, with a color scale indicating participation levels. Lighter shades of blue represent fewer test takers, while darker shades signify higher numbers. It shows that states like California and Texas are shown in darker blue, indicating a higher number of test takers, whereas less populous states such as Wyoming and Vermont appear in lighter blue, reflecting lower participation. The map reveals regional disparities, with higher test-taker concentrations in populous areas, particularly in the South and along the West Coast, while rural states tend to have fewer test takers. 
 
-
+This map visualizes the total number of test takers by state, with a color scale indicating participation levels. Lighter shades of blue represent fewer test takers, while darker shades signify higher numbers. It shows that states like California and Texas are shown in darker blue, indicating a higher number of test takers, whereas less populous states such as Wyoming and Vermont appear in lighter blue, reflecting lower participation. The map reveals regional disparities, with higher test-taker concentrations in populous areas, particularly in the South and along the West Coast, while rural states tend to have fewer test takers. One concern of this map is that it misses two states, Alaska and Hawaii, which makes the visualization a little bit incomplete. 
