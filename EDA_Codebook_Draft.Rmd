@@ -38,24 +38,21 @@ head(score)
 
 ## Data Cleaning/Simplifying
 
-It is shown that there are 99 variables total in this dataset, which is too many for our analysis. After careful examination of the dataset, we decided to subset the dataset with the variables we think that are useful for our analysis. 
+It is shown that there are 99 variables total in this dataset, which is too many for our analysis. Since our purpose of analysis is to investigate disparities and inequalities in educational outcomes across different regions and demographic groups, we decided to subset the dataset with the variables we think that are useful for our analysis. 
 ```{r}
 # Subset the dataset with relevant variables 
 demographic_vars <- c("Year", "State.Code", "State.Name")
 test_score_vars <- c("Total.Math", "Total.Test.takers", "Total.Verbal", 
                      "Gender.Female.Math", "Gender.Female.Test.takers" , "Gender.Female.Verbal",
                      "Gender.Male.Math", "Gender.Male.Test.takers","Gender.Male.Verbal")
-academic_vars <- c("Academic.Subjects.Arts.Music.Average.GPA", 
-                   "Academic.Subjects.English.Average.GPA",
-                   "Academic.Subjects.Mathematics.Average.GPA", 
-                   "Academic.Subjects.Natural.Sciences.Average.Years")
 income_vars <- grep("Family.Income", colnames(score), value = TRUE)
 gpa_vars <- grep("GPA", colnames(score), value = TRUE)
 ```
 
+
 ```{r}
 # Combine all selected variables into one vector
-selected_vars <- c(demographic_vars, test_score_vars, academic_vars, income_vars, gpa_vars)
+selected_vars <- c(demographic_vars, test_score_vars, income_vars, gpa_vars)
 ```
 
 ```{r}
@@ -125,8 +122,8 @@ Average Years of Study: For example, Academic.Subjects.English.Average.Years.
 R Code to display Academic Performance Variables
 
 ```{r}
-academic_data <- score_subset[, academic_vars]
-print(academic_data)
+#academic_data <- score_subset[, academic_vars]
+#print(academic_data)
 ```
 
 ### Theme 4. Family Income Groups
