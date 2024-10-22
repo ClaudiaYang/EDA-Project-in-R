@@ -45,14 +45,15 @@ demographic_vars <- c("Year", "State.Code", "State.Name")
 test_score_vars <- c("Total.Math", "Total.Test.takers", "Total.Verbal", 
                      "Gender.Female.Math", "Gender.Female.Test.takers" , "Gender.Female.Verbal",
                      "Gender.Male.Math", "Gender.Male.Test.takers","Gender.Male.Verbal")
+academic_vars <- c("Academic.Subjects.English.Average.GPA", "Academic.Subjects.Mathematics.Average.GPA")
 income_vars <- grep("Family.Income", colnames(score), value = TRUE)
-gpa_vars <- grep("GPA", colnames(score), value = TRUE)
+gpa_vars <- grep("^GPA", colnames(score), value = TRUE)
 ```
 
 
 ```{r}
 # Combine all selected variables into one vector
-selected_vars <- c(demographic_vars, test_score_vars, income_vars, gpa_vars)
+selected_vars <- c(demographic_vars, test_score_vars, academic_vars, income_vars, gpa_vars)
 ```
 
 ```{r}
@@ -69,7 +70,7 @@ head(score_subset)
 
 ```{r,echo = FALSE}
 #Summary Statistics of the dataset
-summary(score_subset)
+#summary(score_subset)
 ```
 
 
@@ -103,10 +104,8 @@ print(demographic_data)
 Test scores represent one of the core components of our dataset. These variables include overall test scores, family income group test scores, and test scores based on GPA. Here are the main variables:
 
 Overall Test Scores: Total.Math, Total.Test.takers, Total.Verbal
-Family Income Brackets: Family.Income.Between.20.40k.Math, Family.Income.More.than.100k.Verbal
-GPA Test Scores: GPA.A.Math, GPA.C.Verbal, GPA.No.response.Math
+111111111111111
 Gender-based Test Scores: Gender.Female.Math, Gender.Male.Verbal
-Score Ranges: These show performance in specific score ranges, such as Score.Ranges.Between.300.to.400.Math.Total.
 
 ```{r}
 test_score_data <- score_subset[, test_score_vars]
@@ -117,13 +116,11 @@ print(test_score_data)
 
 Our dataset also provides information on GPA and the number of years spent studying different subjects. The subjects include arts, English, foreign languages, mathematics, and natural sciences. Each subject has two variables:
 
-Average GPA: For example, Academic.Subjects.English.Average.GPA.
-Average Years of Study: For example, Academic.Subjects.English.Average.Years.
-R Code to display Academic Performance Variables
+1111111111111
 
 ```{r}
-#academic_data <- score_subset[, academic_vars]
-#print(academic_data)
+academic_data <- score_subset[, academic_vars]
+print(academic_data)
 ```
 
 ### Theme 4. Family Income Groups
@@ -145,6 +142,7 @@ Our dataset provides a breakdown of test scores based on GPA ranges. Students ar
 
 GPA.A.Math
 GPA.B.Verbal
+111111111
 GPA.D.or.lower.Math
 
 ```{r}
@@ -160,50 +158,31 @@ print(gpa_data)
 - We calculated the mean math score for each GPA category and plotted it in a bar plot. This visualization shows how math scores are distributed across GPA categories, with each bar representing the average math score for a specific GPA range (from "A+" to "D or lower"). 
 
 ```{r}
-gpa_math_data <- data.frame(
-  GPA = c("A+", "A", "A-", "B", "C", "D or lower"),
-  Math_Scores = c(mean(score_subset$GPA.A.plus.Math, na.rm = TRUE), 
-                  mean(score_subset$GPA.A.Math, na.rm = TRUE), 
-                  mean(score_subset$GPA.A.minus.Math, na.rm = TRUE),
-                  mean(score_subset$GPA.B.Math, na.rm = TRUE),
-                  mean(score_subset$GPA.C.Math, na.rm = TRUE),
-                  mean(score_subset$GPA.D.or.lower.Math, na.rm = TRUE))
+gpa_data_long <- data.frame(
+  GPA = rep(c("A+", "A", "A-", "B", "C", "D or lower"), 2),
+  Score_Type = rep(c("Math", "Verbal"), each = 6),
+  Scores = c(
+    sapply(c("A.plus", "A", "A.minus", "B", "C", "D.or.lower"), 
+           function(grade) mean(gpa_data[[paste0("GPA.", grade, ".Math")]], na.rm = TRUE)),
+    sapply(c("A.plus", "A", "A.minus", "B", "C", "D.or.lower"), 
+           function(grade) mean(gpa_data[[paste0("GPA.", grade, ".Verbal")]], na.rm = TRUE))
+  )
 )
+gpa_data_long$GPA <- factor(gpa_data_long$GPA, levels = c("A+", "A", "A-", "B", "C", "D or lower"))
 
-barplot(gpa_math_data$Math_Scores, 
-        names.arg = gpa_math_data$GPA, 
-        main = "Average Math Scores by GPA Category", 
-        xlab = "GPA Category", 
-        ylab = "Math Scores",
-        col = "lightblue")
+ggplot(gpa_data_long, aes(x = GPA, y = Scores, fill = Score_Type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Average Math and Verbal Scores by GPA Category",
+       x = "GPA Category", y = "Scores") +
+  scale_fill_manual(values = c("Math" = "lightblue", "Verbal" = "lightcoral")) +
+  theme_minimal()
+
 ```
 
 We can observe a decreasing trend in the plot, indicating an association between GPA and math scores. 
 The students with an "A+" GPA have the highest average math scores, while those in the "D or lower" category have the lowest. This suggests that students with higher GPAs tend to perform better in SAT math, and there's a consistent drop in math scores as GPA decreases. 
 
 - We calculated the mean verbal score for each GPA category and plotted it in a bar plot. This visualization shows how verbal scores are distributed across GPA categories, with each bar representing the average verbal score for a specific GPA range (from "A+" to "D or lower").
-
-```{r}
-#Average verbal scores across different GPA categories
-gpa_verbal_data <- data.frame(
-  GPA = c("A+", "A", "A-", "B", "C", "D or lower"),
-  Verbal_Scores = c(mean(score_subset$GPA.A.plus.Verbal, na.rm = TRUE), 
-                    mean(score_subset$GPA.A.Verbal, na.rm = TRUE), 
-                    mean(score_subset$GPA.A.minus.Verbal, na.rm = TRUE),
-                    mean(score_subset$GPA.B.Verbal, na.rm = TRUE),
-                    mean(score_subset$GPA.C.Verbal, na.rm = TRUE),
-                    mean(score_subset$GPA.D.or.lower.Verbal, na.rm = TRUE))
-)
-
-barplot(gpa_verbal_data$Verbal_Scores, 
-        names.arg = gpa_verbal_data$GPA, 
-        main = "Average Verbal Scores by GPA Category", 
-        xlab = "GPA Category", 
-        ylab = "Verbal Scores", 
-        col = "lightblue")
-
-
-```
 
 From this figure, we can observe a decreasing trend in average verbal scores as GPA decreases, suggesting a positive correlation between GPA and verbal performance.  Students with an "A+" GPA have the highest average verbal scores, while those in the "D or lower" category have the lowest.  This indicates that students with higher GPAs tend to perform better in verbal assessments, and there is a consistent decline in scores as the GPA drops.
 
@@ -212,9 +191,8 @@ From this figure, we can observe a decreasing trend in average verbal scores as 
 - We get the number of test takers in each family income group, such as those earning less than 20k or more than 100k, excluding missing values. We then draw a pie chart to visualize the distribution of test takers across these income groups, helping to illustrate how the number of test takers varies by family income.
 
 ```{r}
-income_takers <- c(sum(score_subset$Family.Income.Less.than.20k.Test.takers, na.rm = TRUE),                    sum(score_subset$Family.Income.Between.20.40k.Test.takers, na.rm = TRUE),                    sum(score_subset$Family.Income.Between.40.60k.Test.takers, na.rm = TRUE),                    sum(score_subset$Family.Income.More.than.100k.Test.takers, na.rm = TRUE))  
+income_takers <- c(sum(income_data$Family.Income.Less.than.20k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.Between.20.40k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.Between.40.60k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.More.than.100k.Test.takers, na.rm = TRUE))  
 income_labels <- c("Less than 20k", "Between 20-40k", "Between 40-60k", "More than 100k")  
-# Calculate the total number of test takers
 total_takers <- sum(income_takers)
 
 # Calculate the percentage for each income group
@@ -233,18 +211,31 @@ The pie chart shows that the distribution of test takers across income groups is
 - We first extracts math scores for different family income groups, creating a new dataset called income_math_data. And we use a boxplot to visualize the distribution of math scores by income bracket, with each group assigned a different color. 
 
 ```{r}
-income_math_data <- score_subset[, c("Family.Income.Less.than.20k.Math", 
-                              "Family.Income.Between.20.40k.Math",
-                              "Family.Income.Between.40.60k.Math",
-                              "Family.Income.More.than.100k.Math")]
+income_data_long <- income_data %>%
+  select(Family.Income.Less.than.20k.Math, Family.Income.Between.20.40k.Math, 
+         Family.Income.Between.40.60k.Math, Family.Income.More.than.100k.Math,
+         Family.Income.Less.than.20k.Verbal, Family.Income.Between.20.40k.Verbal, 
+         Family.Income.Between.40.60k.Verbal, Family.Income.More.than.100k.Verbal) %>%
+  pivot_longer(cols = everything(),
+               names_to = c("Income_Bracket", "Score_Type"),
+               names_pattern = "Family.Income.(.*)\\.(.*)",
+               values_to = "Scores") %>%
+  mutate(Income_Bracket = case_when(
+    Income_Bracket == "Less.than.20k" ~ "<20k",
+    Income_Bracket == "Between.20.40k" ~ "20-40k",
+    Income_Bracket == "Between.40.60k" ~ "40-60k",
+    Income_Bracket == "More.than.100k" ~ ">100k"
+  )) %>%
+   mutate(Income_Bracket = factor(Income_Bracket, levels = c("<20k", "20-40k", "40-60k", ">100k")))
 
-colnames(income_math_data) <- c("<20k", "20-40k", "40-60k", ">100k")
+# Create a boxplot for both Math and Verbal Scores by Family Income Bracket
+ggplot(income_data_long, aes(x = Income_Bracket, y = Scores, fill = Score_Type)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Math and Verbal Scores by Family Income Bracket",
+       x = "Family Income Bracket", y = "Scores") +
+  scale_fill_manual(values = c("Math" = "lightblue", "Verbal" = "lightcoral")) +
+  theme_minimal()
 
-boxplot(income_math_data, 
-        main = "Distribution of Math Scores by Family Income Bracket", 
-        xlab = "Family Income Bracket", 
-        ylab = "Math Scores", 
-        col = c("lightgreen", "lightblue", "lightcoral", "lightgoldenrod"))
 ```
 
 The boxplot shows that the median math scores are similar across all income groups, with a slight increasing trend as income rises. However, the <20k income group has the widest range of scores, including several low outliers. The >100k group has more high-performing students, with fewer outliers at the low end. The middle-income groups, 20-40k and 40-60k, show less variability, with most scores tightly clustered. 
@@ -254,11 +245,10 @@ The boxplot shows that the median math scores are similar across all income grou
 - We plotted a histogram of total math and verbal scores to understand the distribution of scores across the sample. The histogram shows how frequently different score ranges occur.
 
 ```{r}
-
 par(mfrow = c(1, 2))
 
 # Plot histogram for Total Math Scores
-hist(score_subset$Total.Math,
+hist(test_score_data$Total.Math,
      breaks = 20,
      main = "Histogram of Total Math Scores",
      xlab = "Math Scores",
@@ -266,7 +256,7 @@ hist(score_subset$Total.Math,
      border = "black")
 
 # Plot histogram for Total Verbal Scores
-hist(score_subset$Total.Verbal,
+hist(test_score_data$Total.Verbal,
      breaks = 20,
      main = "Histogram of Total Verbal Scores",
      xlab = "Verbal Scores",
@@ -285,12 +275,12 @@ To better assess whether these distributions follow a normal distribution, we wi
 par(mfrow = c(1, 2))
 
 # QQ plot for Total Math Scores
-qqnorm(score_subset$Total.Math, main = "QQ Plot of Math Scores", col = "lightcoral")
-qqline(score_subset$Total.Math, col = "black")
+qqnorm(test_score_data$Total.Math, main = "QQ Plot of Math Scores", col = "lightcoral")
+qqline(test_score_data$Total.Math, col = "black")
 
 # QQ plot for Total Verbal Scores
-qqnorm(score_subset$Total.Verbal, main = "QQ Plot of Verbal Scores", col = "lightblue")
-qqline(score_subset$Total.Verbal, col = "black")
+qqnorm(test_score_data$Total.Verbal, main = "QQ Plot of Verbal Scores", col = "lightblue")
+qqline(test_score_data$Total.Verbal, col = "black")
 
 par(mfrow = c(1, 1))
 ```
@@ -300,7 +290,7 @@ We observe that both math and verbal scores show some degree of deviation from a
 To further explore this relationship, we generated a scatter plot to visualize the correlation between math and verbal scores. Each point on the graph represents an individual student's performance in both areas, offering a clearer view of how these two variables may interact. This visual representation helps highlight any patterns or outliers, allowing us to assess whether the non-normality at the extremes is reflected in the correlation between the two variables.
 
 ```{r}
-plot(score_subset$Total.Math, score_subset$Total.Verbal, 
+plot(test_score_data$Total.Math, test_score_data$Total.Verbal, 
      main = "Math Scores vs. Verbal Scores", 
      xlab = "Math Scores", 
      ylab = "Verbal Scores", 
@@ -316,8 +306,8 @@ The scatter plot shows a strong positive relationship between math and verbal sc
 - We plotted a pie chart to represent the distribution of test takers by gender. The chart is divided into two segments, each showing the proportion of male and female participants in the test. 
 
 ```{r}
-gender_takers <- c(sum(score_subset$Gender.Female.Test.takers, na.rm = TRUE),
-                   sum(score_subset$Gender.Male.Test.takers, na.rm = TRUE))
+gender_takers <- c(sum(test_score_data$Gender.Female.Test.takers, na.rm = TRUE),
+                   sum(test_score_data$Gender.Male.Test.takers, na.rm = TRUE))
 gender_labels <- c("Female", "Male")
 # Calculate the total number of test takers
 total_takers <- sum(gender_takers)
@@ -342,12 +332,12 @@ From the pie chart, we can observe that there are slightly more female test take
 # Calculate average math and verbal scores by gender
 gender_scores <- data.frame(
   Gender = c("Female", "Male"),
-  Avg_Math = c(mean(score_subset$Gender.Female.Math, na.rm = TRUE),
-               mean(score_subset$Gender.Male.Math, na.rm = TRUE)),
-  Avg_Verbal = c(mean(score_subset$Gender.Female.Verbal, na.rm = TRUE),
-                 mean(score_subset$Gender.Male.Verbal, na.rm = TRUE))
+  Avg_Math = c(mean(test_score_data$Gender.Female.Math, na.rm = TRUE),
+               mean(test_score_data$Gender.Male.Math, na.rm = TRUE)),
+  Avg_Verbal = c(mean(test_score_data$Gender.Female.Verbal, na.rm = TRUE),
+                 mean(test_score_data$Gender.Male.Verbal, na.rm = TRUE))
 )
-# Reshape the data to long format for ggplot2
+
 gender_scores_long <- gender_scores %>%
   pivot_longer(cols = c(Avg_Math, Avg_Verbal), 
                names_to = "Score_Type", 
@@ -366,13 +356,13 @@ The bar plot shows a comparison of average math and verbal scores by gender. We 
 
 ```{r}
 # Perform t-test for math scores
-math_ttest <- t.test(score_subset$Gender.Female.Math, 
-                     score_subset$Gender.Male.Math, 
+math_ttest <- t.test(test_score_data$Gender.Female.Math, 
+                     test_score_data$Gender.Male.Math, 
                      na.rm = TRUE)
 
 # Perform t-test for verbal scores
-verbal_ttest <- t.test(score_subset$Gender.Female.Verbal, 
-                       score_subset$Gender.Male.Verbal, 
+verbal_ttest <- t.test(test_score_data$Gender.Female.Verbal, 
+                       test_score_data$Gender.Male.Verbal, 
                        na.rm = TRUE)
 
 # Print the results of the t-tests
@@ -384,6 +374,28 @@ verbal_ttest
 Math Scores: The p-value is smaller than 0.05, indicating a statistically significant difference between the math scores of females and males. The confidence interval does not contain 0, further supporting the conclusion that the true difference in means is significant. Males, on average, scored about 35 points higher than females in math (553.91 vs. 518.42).
 
 Verbal Scores:The p-value (0.01266) is also smaller than 0.05, indicating a statistically significant difference between verbal scores for females and males. However, the difference is much smaller compared to math scores, with males scoring about 6.5 points higher than females on average.
+
+
+### Academic Performance vs. SAT score Analysis
+
+```{r}
+par(mfrow = c(1, 2))
+
+# Plot for Math Scores vs Mathematics GPA
+plot(score_subset$Total.Math, score_subset$Academic.Subjects.Mathematics.Average.GPA,
+     main = "Math Scores vs. Mathematics GPA",
+     xlab = "Math Scores", ylab = "Mathematics GPA",
+     pch = 19, col = "blue", cex = 0.6)
+
+# Plot for Verbal Scores vs English GPA
+plot(score_subset$Total.Verbal, score_subset$Academic.Subjects.English.Average.GPA,
+     main = "Verbal Scores vs. English GPA",
+     xlab = "Verbal Scores", ylab = "English GPA",
+     pch = 19, col = "red", cex = 0.6)
+
+par(mfrow = c(1, 1))
+```
+
 
 ### Map 
 Next, we want to use a map to visualize the total number of test takers by state because it highlights regional disparities in test participation, helping to identify areas with low engagement with education. This visualization shows unequal resource allocation and informing policies that can improve access to testing. By visualizing this data, we can better understand where educational interventions are most needed to promote equity across states.
