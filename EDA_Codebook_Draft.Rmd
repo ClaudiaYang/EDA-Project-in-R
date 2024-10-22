@@ -150,11 +150,18 @@ This map visualizes the total number of test takers by state, with a color scale
 
 ## Theme 2: Test Scores
 
-Test scores represent one of the core components of our dataset. These variables include overall test scores, family income group test scores, and test scores based on GPA. Here are the main variables:
+Test scores represent one of the core components of our dataset. These variables include overall test scores, family income group test scores, and test scores based on GPA. Here are the variables:
 
-Overall Test Scores: Total.Math, Total.Test.takers, Total.Verbal
-111111111111111
-Gender-based Test Scores: Gender.Female.Math, Gender.Male.Verbal
+
+- Total.Test.takers: The number of test-takers in this state during this year
+- Gender.Female.Test,takers: The number of test-takers in this state during this year who identified as female
+- Gender.Male.Test,takers: The number of test-takers in this state during this year who identified as male
+
+- Total.Math: The average Math score of students in this state during this year
+- Total.Verbal: The average Verbal score of students in this state during this year
+
+- Gender.Female(Male).Math: The average Math score of students in this state during this year who identified as female(male)
+- Gender.Female(Male).Verbal: The average Verbal score of students in this state during this year who identified as female(male)
 
 ```{r}
 test_score_data <- score_subset[, test_score_vars]
@@ -341,7 +348,9 @@ Verbal Scores:The p-value (0.01266) is also smaller than 0.05, indicating a stat
 
 Our dataset also provides information on GPA and the number of years spent studying different subjects. The subjects include arts, English, foreign languages, mathematics, and natural sciences. Each subject has two variables:
 
-1111111111111
+- Academic.Subjects.English.Average.GPA: The average GPA of all students in this state during this year in English.
+
+- Academic.Subjects.Mathematics.Average.GPA: The average GPA of all students in this state during this year in Math. 
 
 ```{r}
 academic_data <- score_subset[, academic_vars]
@@ -349,6 +358,8 @@ head(academic_data)
 ```
 
 ### Academic Performance vs. SAT score Analysis
+
+We created two scatter plots to explore the relationship between SAT scores and academic GPA in specific subjects. The first plot shows the relationship between math scores and mathematics GPA, with the math scores on the x-axis and the average GPA in math on the y-axis. The second plot shows the relationship between verbal scores and English GPA, with verbal scores on the x-axis and the average GPA in English on the y-axis. Different colors and symbols are used to distinguish between the two subjects: blue for math and red for verbal scores.
 
 ```{r}
 par(mfrow = c(1, 2))
@@ -367,15 +378,16 @@ plot(score_subset$Total.Verbal, score_subset$Academic.Subjects.English.Average.G
 
 par(mfrow = c(1, 1))
 ```
+From the plots, we can observe a positive relationship between SAT scores and GPA for both subjects. For math, higher SAT math scores are associated with higher mathematics GPAs, though the data appears more spread out. In contrast, the relationship between verbal scores and English GPA seems tighter, with a clearer upward trend, indicating a strong correlation between better verbal performance on the SAT and higher academic performance in English.
 
 
 ## Theme 4. Family Income Groups
 
 Family income groups are crucial in understanding how socioeconomic factors influence student performance. Our dataset includes variables for different income brackets and their corresponding test scores:
 
-Family.Income.Between.20.40k.Math
-Family.Income.More.than.100k.Verbal
-Family.Income.Less.than.20k.Test.takers
+- Family.Income.Between.20.40k.Math: The average Math score of students in this state during this year who reported that their family income was in this bracket
+- Family.Income.More.than.100k.Verbal: The average Verbal (Reading, not Writing) score of students in this state during this year who reported that their family income was in this bracket
+- Family.Income.Less.than.20k.Test.takers: The average Verbal (Reading, not Writing) score of students in this state during this year who reported that their family income was in this bracket
 
 ```{r}
 income_data <- score_subset[, income_vars]
@@ -384,7 +396,7 @@ head(income_data)
 
 ### Family Income Group Analysis
 
-- We get the number of test takers in each family income group, such as those earning less than 20k or more than 100k, excluding missing values. We then draw a pie chart to visualize the distribution of test takers across these income groups, helping to illustrate how the number of test takers varies by family income.
+We get the number of test takers in each family income group, such as those earning less than 20k or more than 100k, excluding missing values. We then draw a pie chart to visualize the distribution of test takers across these income groups, helping to illustrate how the number of test takers varies by family income.
 
 ```{r}
 income_takers <- c(sum(income_data$Family.Income.Less.than.20k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.Between.20.40k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.Between.40.60k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.More.than.100k.Test.takers, na.rm = TRUE))  
@@ -404,7 +416,7 @@ pie(income_takers, labels = income_labels,
 
 The pie chart shows that the distribution of test takers across income groups is fairly balanced, but the "More than 100k" group occupies the largest portion. 
 
-- We first extracts math scores for different family income groups, creating a new dataset called income_math_data. And we use a boxplot to visualize the distribution of math scores by income bracket, with each group assigned a different color. 
+We first extracts math scores for different family income groups, creating a new dataset called income_math_data. And we use a boxplot to visualize the distribution of math scores by income bracket, with each group assigned a different color. 
 
 ```{r}
 income_data_long <- income_data %>%
@@ -441,10 +453,9 @@ The boxplot shows that the median math scores are similar across all income grou
 
 Our dataset provides a breakdown of test scores based on GPA ranges. Students are categorized into groups based on their GPA, ranging from A+ to D or lower. This allows for analysis of how students in different GPA ranges perform on standardized tests:
 
-GPA.A.Math
-GPA.B.Verbal
-111111111
-GPA.D.or.lower.Math
+- GPA.A(A.plus/A.minus/B/.../D.or.lower/No.response).Test.takers: The number of test-takers in this state during this year who reported this for their high school grade point average
+- GPA.A(A.plus/A.minus/B/.../D.or.lower/No.response).Verbal: The average Verbal (Reading, not Writing) score of students in this state during this year who reported this for their high school grade point average
+- GPA.A(A.plus/A.minus/B/.../D.or.lower/No.response).Math: The average math score of students in this state during this year who reported this for their high school grade point average
 
 ```{r}
 gpa_data <- score_subset[, gpa_vars]
@@ -453,7 +464,7 @@ head(gpa_data)
 
 ### Average Math & Verbal Scores vs. GPA Analysis
 
-- We calculated the mean math score for each GPA category and plotted it in a bar plot. This visualization shows how math scores are distributed across GPA categories, with each bar representing the average math score for a specific GPA range (from "A+" to "D or lower"). 
+We calculated the mean math score for each GPA category and plotted it in a bar plot. This visualization shows how math scores are distributed across GPA categories, with each bar representing the average math score for a specific GPA range (from "A+" to "D or lower"). 
 
 ```{r}
 gpa_data_long <- data.frame(
@@ -480,7 +491,7 @@ ggplot(gpa_data_long, aes(x = GPA, y = Scores, fill = Score_Type)) +
 We can observe a decreasing trend in the plot, indicating an association between GPA and math scores. 
 The students with an "A+" GPA have the highest average math scores, while those in the "D or lower" category have the lowest. This suggests that students with higher GPAs tend to perform better in SAT math, and there's a consistent drop in math scores as GPA decreases. 
 
-- We calculated the mean verbal score for each GPA category and plotted it in a bar plot. This visualization shows how verbal scores are distributed across GPA categories, with each bar representing the average verbal score for a specific GPA range (from "A+" to "D or lower").
+We calculated the mean verbal score for each GPA category and plotted it in a bar plot. This visualization shows how verbal scores are distributed across GPA categories, with each bar representing the average verbal score for a specific GPA range (from "A+" to "D or lower").
 
 From this figure, we can observe a decreasing trend in average verbal scores as GPA decreases, suggesting a positive correlation between GPA and verbal performance.  Students with an "A+" GPA have the highest average verbal scores, while those in the "D or lower" category have the lowest.  This indicates that students with higher GPAs tend to perform better in verbal assessments, and there is a consistent decline in scores as the GPA drops.、
 
