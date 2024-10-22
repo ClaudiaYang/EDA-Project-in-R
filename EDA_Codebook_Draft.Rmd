@@ -445,3 +445,43 @@ ggplot() +
 ```
 
 This map visualizes the total number of test takers by state, with a color scale indicating participation levels. Lighter shades of blue represent fewer test takers, while darker shades signify higher numbers. It shows that states like California and Texas are shown in darker blue, indicating a higher number of test takers, whereas less populous states such as Wyoming and Vermont appear in lighter blue, reflecting lower participation. The map reveals regional disparities, with higher test-taker concentrations in populous areas, particularly in the South and along the West Coast, while rural states tend to have fewer test takers. One concern of this map is that it misses two states, Alaska and Hawaii, which makes the visualization a little bit incomplete. 
+
+
+```{r}
+score_trend_long <- score_subset %>%
+  group_by(Year) %>%
+  summarise(Total.Math.Mean = mean(Total.Math, na.rm = TRUE),
+            Total.Verbal.Mean = mean(Total.Verbal, na.rm = TRUE)) %>%
+  pivot_longer(cols = c(Total.Math.Mean, Total.Verbal.Mean),
+               names_to = "Test_Type",
+               values_to = "Mean_Scores")
+
+# Plot the trend by year using ggplot2
+ggplot(score_trend_long, aes(x = Year, y = Mean_Scores, color = Test_Type)) +
+  geom_line(size = 1) +  # Create line plot
+  geom_point(size = 1) +   # Add points for emphasis
+  labs(title = "Trend of Average Math and Verbal Scores Over the Years",
+       x = "Year", y = "Average Scores",
+       color = "Test Type") +
+  theme_minimal() +
+  scale_color_manual(values = c("Total.Math.Mean" = "blue", 
+                                "Total.Verbal.Mean" = "red"))
+```
+
+
+```{r}
+testtaker_trend <- score_subset %>%
+  group_by(Year) %>%
+  summarise(Total.Test.Takers.Sum = sum(Total.Test.takers, na.rm = TRUE))
+
+# Plot the trend by year using ggplot2
+ggplot(testtaker_trend, aes(x = Year, y = Total.Test.Takers.Sum)) +
+  geom_line(size = 1, color = "blue") +  # Create line plot
+  geom_point(size = 1, color = "blue") +   # Add points for emphasis
+  labs(title = "Trend of Total Test Takers Over the Years",
+       x = "Year", y = "Total Test Takers") +
+  theme_minimal()
+```
+
+Limitation 1:
+We conducted a thorough analysis of the data from 2005 to 2015. When calculating averages, we averaged the data across these years since the dataset is panel data. While this approach may overlook some detailed year-to-year changes and trends, we believe it offers valuable insights into broader patterns in education that could inform the next decade.
