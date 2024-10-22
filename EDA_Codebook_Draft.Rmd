@@ -16,7 +16,7 @@ library(maps)
 library(scales)
 ```
 
-## Introduction
+# Introduction
 
 This dataset, sourced from the Common Core of Data (CCD), is a comprehensive, annual national database maintained by the U.S. Department of Education, providing reliable information on all public elementary and secondary schools and districts in the U.S. It focuses on school performance scores across various U.S. states from 2005 to 2015, offering potential insights into the educational landscape in the United States. The dataset includes variables such as graduation rates, test scores, teacher statistics, student-teacher ratios, gender ratios, family income, and other factors that can impact school performance, typically measured by GPA.
 
@@ -36,7 +36,7 @@ score<-read.csv("data/school_scores.csv")
 # head(score)
 ```
 
-## Data Cleaning/Simplifying
+# Data Cleaning/Simplifying
 
 It is shown that there are 99 variables total in this dataset, which is too many for our analysis. Since our purpose of analysis is to investigate disparities and inequalities in educational outcomes across different regions and demographic groups, we decided to subset the dataset with the variables we think that are useful for our analysis. 
 ```{r}
@@ -81,12 +81,11 @@ write_csv(score_subset, "data/school_scores_subset.csv")
 
 By the code above, we reduced the variables from 99 to 58, leaving the ones we think are potentially insightful only. 
 
-
-## Part I: Describing and Breaking down Variables
+# Breakdown & Analysis
 
 In the dataset subseting section, we have catgetorized the 58 variables into four themes. We would now explore the four themes separately. 
 
-### Theme 1: Demographic information
+## Theme 1: Demographic information
 
 The dataset contains basic demographic information that helps identify the year and the state in which the data was collected. These variables include:
 
@@ -149,7 +148,7 @@ ggplot() +
 This map visualizes the total number of test takers by state, with a color scale indicating participation levels. Lighter shades of blue represent fewer test takers, while darker shades signify higher numbers. It shows that states like California and Texas are shown in darker blue, indicating a higher number of test takers, whereas less populous states such as Wyoming and Vermont appear in lighter blue, reflecting lower participation. The map reveals regional disparities, with higher test-taker concentrations in populous areas, particularly in the South and along the West Coast, while rural states tend to have fewer test takers. One concern of this map is that it misses two states, Alaska and Hawaii, which makes the visualization a little bit incomplete. 
 
 
-### Theme 2: Test Scores
+## Theme 2: Test Scores
 
 Test scores represent one of the core components of our dataset. These variables include overall test scores, family income group test scores, and test scores based on GPA. Here are the main variables:
 
@@ -336,7 +335,7 @@ Verbal Scores:The p-value (0.01266) is also smaller than 0.05, indicating a stat
 
 
 
-### Theme 3: Academic Performance in Subjects
+## Theme 3: Academic Performance in Subjects
 
 Our dataset also provides information on GPA and the number of years spent studying different subjects. The subjects include arts, English, foreign languages, mathematics, and natural sciences. Each subject has two variables:
 
@@ -368,7 +367,7 @@ par(mfrow = c(1, 1))
 ```
 
 
-### Theme 4. Family Income Groups
+## Theme 4. Family Income Groups
 
 Family income groups are crucial in understanding how socioeconomic factors influence student performance. Our dataset includes variables for different income brackets and their corresponding test scores:
 
@@ -436,7 +435,7 @@ ggplot(income_data_long, aes(x = Income_Bracket, y = Scores, fill = Score_Type))
 The boxplot shows that the median math scores are similar across all income groups, with a slight increasing trend as income rises. However, the <20k income group has the widest range of scores, including several low outliers. The >100k group has more high-performing students, with fewer outliers at the low end. The middle-income groups, 20-40k and 40-60k, show less variability, with most scores tightly clustered. 
 
 
-### Theme 5: GPA-based Breakdown
+## Theme 5: GPA-based Breakdown
 
 Our dataset provides a breakdown of test scores based on GPA ranges. Students are categorized into groups based on their GPA, ranging from A+ to D or lower. This allows for analysis of how students in different GPA ranges perform on standardized tests:
 
@@ -484,5 +483,7 @@ The students with an "A+" GPA have the highest average math scores, while those 
 From this figure, we can observe a decreasing trend in average verbal scores as GPA decreases, suggesting a positive correlation between GPA and verbal performance.  Students with an "A+" GPA have the highest average verbal scores, while those in the "D or lower" category have the lowest.  This indicates that students with higher GPAs tend to perform better in verbal assessments, and there is a consistent decline in scores as the GPA drops.、
 
 
-### Limitation 1:
+# Limitation 1:
 We conducted a thorough analysis of the data from 2005 to 2015. When calculating averages, we averaged the data across these years since the dataset is panel data. While this approach may overlook some detailed year-to-year changes and trends, we believe it offers valuable insights into broader patterns in education that could inform the next decade.
+
+# Further Discussion
