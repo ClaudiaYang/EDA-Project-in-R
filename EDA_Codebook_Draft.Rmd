@@ -505,3 +505,6 @@ Our analysis opens several pathways for future research and raises important que
 Moreover, the impact of socioeconomic status, as captured by the family income variables, suggests that future research could focus on income inequality and its long-term effects on educational outcomes. Are the patterns observed in this dataset consistent with more recent data? What advantages does higher income actually provide to students, such as access to more after-school programs, better family support, or greater parental involvement? Additionally, how might policy changes, such as increased funding for lower-income schools or the introduction of new educational technologies, influence these trends?
 
 Finally, since our data only covers 2005 to 2015, it would be valuable to compare it with more recent data, particularly from the COVID-19 period. What new patterns have emerged? Have disparities widened or narrowed? These are all important questions that future research could address.
+
+# Citation
+Cory Bart, A. (2016). School_scores (2.0.0) [Dataset]. https://corgis-edu.github.io/corgis/csv/school_scores/
