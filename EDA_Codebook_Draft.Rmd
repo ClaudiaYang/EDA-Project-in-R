@@ -99,6 +99,56 @@ demographic_data <- score_subset[, demographic_vars]
 head(demographic_data)
 ```
 
+### Map 
+Next, we want to use a map to visualize the total number of test takers by state because it highlights regional disparities in test participation, helping to identify areas with low engagement with education. This visualization shows unequal resource allocation and informing policies that can improve access to testing. By visualizing this data, we can better understand where educational interventions are most needed to promote equity across states.
+
+Firstly, we would load the dataset,ensure the summarized data is correct before proceeding with map-related steps.
+```{r}
+# Summarize the total test takers by state
+state_test_takers <- score_subset %>%
+  group_by(State.Code) %>%
+  summarise(total_takers = sum(Total.Test.takers, na.rm = TRUE))
+```
+
+Next, we would prepare the data ready to be put on a map by cleaning the dataset and merge by state names. 
+```{r}
+# Get U.S. states map data
+states_map <- map_data("state")
+
+# Convert state codes to lowercase for matching
+state_test_takers$region <- tolower(state.name[match(state_test_takers$State.Code, state.abb)])
+
+# Merge test takers data with the map data, making sure to keep 'group' column from states_map
+map_data_merged <- left_join(states_map, state_test_takers, by = "region")
+
+# Fill missing total_takers with 0 (or another value)
+map_data_merged$total_takers[is.na(map_data_merged$total_takers)] <- 0
+
+# Calculate centroids (average latitude and longitude) for each state
+state_centroids <- map_data_merged %>%
+  group_by(region) %>%
+  summarise(long = mean(long), lat = mean(lat))
+
+# Add the state abbreviations (State.Code) to the centroids data
+state_centroids$State.Code <- state_test_takers$State.Code[match(state_centroids$region, state_test_takers$region)]
+```
+
+Finally, we put the data on map. 
+```{r}
+# Plot the map with state abbreviations
+ggplot() +
+  geom_polygon(data = map_data_merged, aes(x = long, y = lat, group = group, fill = total_takers), color = "black") +
+  geom_text(data = state_centroids, aes(x = long, y = lat, label = State.Code), size = 3, color = "white") +
+  scale_fill_continuous(name = "Total Test Takers", low = "lightblue", high = "darkblue", na.value = "grey50") +
+  theme_minimal() +
+  labs(title = "Total Test Takers by State") +
+  theme(legend.position = "bottom")
+
+```
+
+This map visualizes the total number of test takers by state, with a color scale indicating participation levels. Lighter shades of blue represent fewer test takers, while darker shades signify higher numbers. It shows that states like California and Texas are shown in darker blue, indicating a higher number of test takers, whereas less populous states such as Wyoming and Vermont appear in lighter blue, reflecting lower participation. The map reveals regional disparities, with higher test-taker concentrations in populous areas, particularly in the South and along the West Coast, while rural states tend to have fewer test takers. One concern of this map is that it misses two states, Alaska and Hawaii, which makes the visualization a little bit incomplete. 
+
+
 ### Theme 2: Test Scores
 
 Test scores represent one of the core components of our dataset. These variables include overall test scores, family income group test scores, and test scores based on GPA. Here are the main variables:
@@ -112,133 +162,6 @@ test_score_data <- score_subset[, test_score_vars]
 head(test_score_data)
 ```
 
-### Theme 3: Academic Performance in Subjects
-
-Our dataset also provides information on GPA and the number of years spent studying different subjects. The subjects include arts, English, foreign languages, mathematics, and natural sciences. Each subject has two variables:
-
-1111111111111
-
-```{r}
-academic_data <- score_subset[, academic_vars]
-head(academic_data)
-```
-
-### Theme 4. Family Income Groups
-
-Family income groups are crucial in understanding how socioeconomic factors influence student performance. Our dataset includes variables for different income brackets and their corresponding test scores:
-
-Family.Income.Between.20.40k.Math
-Family.Income.More.than.100k.Verbal
-Family.Income.Less.than.20k.Test.takers
-
-```{r}
-income_data <- score_subset[, income_vars]
-head(income_data)
-```
-
-### Theme 5: GPA-based Breakdown
-
-Our dataset provides a breakdown of test scores based on GPA ranges. Students are categorized into groups based on their GPA, ranging from A+ to D or lower. This allows for analysis of how students in different GPA ranges perform on standardized tests:
-
-GPA.A.Math
-GPA.B.Verbal
-111111111
-GPA.D.or.lower.Math
-
-```{r}
-gpa_data <- score_subset[, gpa_vars]
-head(gpa_data)
-```
-
-
-## Part II: Some Simple Analysis and Visualizations
-
-### Average Math & Verbal Scores vs. GPA Analysis
-
-- We calculated the mean math score for each GPA category and plotted it in a bar plot. This visualization shows how math scores are distributed across GPA categories, with each bar representing the average math score for a specific GPA range (from "A+" to "D or lower"). 
-
-```{r}
-gpa_data_long <- data.frame(
-  GPA = rep(c("A+", "A", "A-", "B", "C", "D or lower"), 2),
-  Score_Type = rep(c("Math", "Verbal"), each = 6),
-  Scores = c(
-    sapply(c("A.plus", "A", "A.minus", "B", "C", "D.or.lower"), 
-           function(grade) mean(gpa_data[[paste0("GPA.", grade, ".Math")]], na.rm = TRUE)),
-    sapply(c("A.plus", "A", "A.minus", "B", "C", "D.or.lower"), 
-           function(grade) mean(gpa_data[[paste0("GPA.", grade, ".Verbal")]], na.rm = TRUE))
-  )
-)
-gpa_data_long$GPA <- factor(gpa_data_long$GPA, levels = c("A+", "A", "A-", "B", "C", "D or lower"))
-
-ggplot(gpa_data_long, aes(x = GPA, y = Scores, fill = Score_Type)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Average Math and Verbal Scores by GPA Category",
-       x = "GPA Category", y = "Scores") +
-  scale_fill_manual(values = c("Math" = "lightblue", "Verbal" = "lightcoral")) +
-  theme_minimal()
-
-```
-
-We can observe a decreasing trend in the plot, indicating an association between GPA and math scores. 
-The students with an "A+" GPA have the highest average math scores, while those in the "D or lower" category have the lowest. This suggests that students with higher GPAs tend to perform better in SAT math, and there's a consistent drop in math scores as GPA decreases. 
-
-- We calculated the mean verbal score for each GPA category and plotted it in a bar plot. This visualization shows how verbal scores are distributed across GPA categories, with each bar representing the average verbal score for a specific GPA range (from "A+" to "D or lower").
-
-From this figure, we can observe a decreasing trend in average verbal scores as GPA decreases, suggesting a positive correlation between GPA and verbal performance.  Students with an "A+" GPA have the highest average verbal scores, while those in the "D or lower" category have the lowest.  This indicates that students with higher GPAs tend to perform better in verbal assessments, and there is a consistent decline in scores as the GPA drops.
-
-### Family Income Group Analysis
-
-- We get the number of test takers in each family income group, such as those earning less than 20k or more than 100k, excluding missing values. We then draw a pie chart to visualize the distribution of test takers across these income groups, helping to illustrate how the number of test takers varies by family income.
-
-```{r}
-income_takers <- c(sum(income_data$Family.Income.Less.than.20k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.Between.20.40k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.Between.40.60k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.More.than.100k.Test.takers, na.rm = TRUE))  
-income_labels <- c("Less than 20k", "Between 20-40k", "Between 40-60k", "More than 100k")  
-total_takers <- sum(income_takers)
-
-# Calculate the percentage for each income group
-income_percentages <- round(income_takers / total_takers * 100, 1)
-
-# Create labels that include both income group and percentage
-income_labels <- paste(income_labels, income_percentages, "%")
-
-# Create the pie chart with percentages
-pie(income_takers, labels = income_labels, 
-    main = "Test Takers by Family Income Group")
-```
-
-The pie chart shows that the distribution of test takers across income groups is fairly balanced, but the "More than 100k" group occupies the largest portion. 
-
-- We first extracts math scores for different family income groups, creating a new dataset called income_math_data. And we use a boxplot to visualize the distribution of math scores by income bracket, with each group assigned a different color. 
-
-```{r}
-income_data_long <- income_data %>%
-  select(Family.Income.Less.than.20k.Math, Family.Income.Between.20.40k.Math, 
-         Family.Income.Between.40.60k.Math, Family.Income.More.than.100k.Math,
-         Family.Income.Less.than.20k.Verbal, Family.Income.Between.20.40k.Verbal, 
-         Family.Income.Between.40.60k.Verbal, Family.Income.More.than.100k.Verbal) %>%
-  pivot_longer(cols = everything(),
-               names_to = c("Income_Bracket", "Score_Type"),
-               names_pattern = "Family.Income.(.*)\\.(.*)",
-               values_to = "Scores") %>%
-  mutate(Income_Bracket = case_when(
-    Income_Bracket == "Less.than.20k" ~ "<20k",
-    Income_Bracket == "Between.20.40k" ~ "20-40k",
-    Income_Bracket == "Between.40.60k" ~ "40-60k",
-    Income_Bracket == "More.than.100k" ~ ">100k"
-  )) %>%
-   mutate(Income_Bracket = factor(Income_Bracket, levels = c("<20k", "20-40k", "40-60k", ">100k")))
-
-# Create a boxplot for both Math and Verbal Scores by Family Income Bracket
-ggplot(income_data_long, aes(x = Income_Bracket, y = Scores, fill = Score_Type)) +
-  geom_boxplot() +
-  labs(title = "Distribution of Math and Verbal Scores by Family Income Bracket",
-       x = "Family Income Bracket", y = "Scores") +
-  scale_fill_manual(values = c("Math" = "lightblue", "Verbal" = "lightcoral")) +
-  theme_minimal()
-
-```
-
-The boxplot shows that the median math scores are similar across all income groups, with a slight increasing trend as income rises. However, the <20k income group has the widest range of scores, including several low outliers. The >100k group has more high-performing students, with fewer outliers at the low end. The middle-income groups, 20-40k and 40-60k, show less variability, with most scores tightly clustered. 
 
 ### Total Scores Analysis
 
@@ -300,6 +223,42 @@ plot(test_score_data$Total.Math, test_score_data$Total.Verbal,
 ```
 
 The scatter plot shows a strong positive relationship between math and verbal scores. As math scores increase, verbal scores tend to increase as well, indicating that students who perform well in math also tend to score higher in verbal sections. 
+
+```{r}
+score_trend_long <- score_subset %>%
+  group_by(Year) %>%
+  summarise(Total.Math.Mean = mean(Total.Math, na.rm = TRUE),
+            Total.Verbal.Mean = mean(Total.Verbal, na.rm = TRUE)) %>%
+  pivot_longer(cols = c(Total.Math.Mean, Total.Verbal.Mean),
+               names_to = "Test_Type",
+               values_to = "Mean_Scores")
+
+# Plot the trend by year using ggplot2
+ggplot(score_trend_long, aes(x = Year, y = Mean_Scores, color = Test_Type)) +
+  geom_line(size = 1) +  # Create line plot
+  geom_point(size = 1) +   # Add points for emphasis
+  labs(title = "Trend of Average Math and Verbal Scores Over the Years",
+       x = "Year", y = "Average Scores",
+       color = "Test Type") +
+  theme_minimal() +
+  scale_color_manual(values = c("Total.Math.Mean" = "blue", 
+                                "Total.Verbal.Mean" = "red"))
+```
+
+
+```{r}
+testtaker_trend <- score_subset %>%
+  group_by(Year) %>%
+  summarise(Total.Test.Takers.Sum = sum(Total.Test.takers, na.rm = TRUE))
+
+# Plot the trend by year using ggplot2
+ggplot(testtaker_trend, aes(x = Year, y = Total.Test.Takers.Sum)) +
+  geom_line(size = 1, color = "blue") +  # Create line plot
+  geom_point(size = 1, color = "blue") +   # Add points for emphasis
+  labs(title = "Trend of Total Test Takers Over the Years",
+       x = "Year", y = "Total Test Takers") +
+  theme_minimal()
+```
 
 ### Gender Group Analysis
 
@@ -376,6 +335,18 @@ Math Scores: The p-value is smaller than 0.05, indicating a statistically signif
 Verbal Scores:The p-value (0.01266) is also smaller than 0.05, indicating a statistically significant difference between verbal scores for females and males. However, the difference is much smaller compared to math scores, with males scoring about 6.5 points higher than females on average.
 
 
+
+### Theme 3: Academic Performance in Subjects
+
+Our dataset also provides information on GPA and the number of years spent studying different subjects. The subjects include arts, English, foreign languages, mathematics, and natural sciences. Each subject has two variables:
+
+1111111111111
+
+```{r}
+academic_data <- score_subset[, academic_vars]
+head(academic_data)
+```
+
 ### Academic Performance vs. SAT score Analysis
 
 ```{r}
@@ -397,91 +368,121 @@ par(mfrow = c(1, 1))
 ```
 
 
-### Map 
-Next, we want to use a map to visualize the total number of test takers by state because it highlights regional disparities in test participation, helping to identify areas with low engagement with education. This visualization shows unequal resource allocation and informing policies that can improve access to testing. By visualizing this data, we can better understand where educational interventions are most needed to promote equity across states.
+### Theme 4. Family Income Groups
 
-Firstly, we would load the dataset,ensure the summarized data is correct before proceeding with map-related steps.
+Family income groups are crucial in understanding how socioeconomic factors influence student performance. Our dataset includes variables for different income brackets and their corresponding test scores:
+
+Family.Income.Between.20.40k.Math
+Family.Income.More.than.100k.Verbal
+Family.Income.Less.than.20k.Test.takers
+
 ```{r}
-# Summarize the total test takers by state
-state_test_takers <- score_subset %>%
-  group_by(State.Code) %>%
-  summarise(total_takers = sum(Total.Test.takers, na.rm = TRUE))
+income_data <- score_subset[, income_vars]
+head(income_data)
 ```
 
-Next, we would prepare the data ready to be put on a map by cleaning the dataset and merge by state names. 
+### Family Income Group Analysis
+
+- We get the number of test takers in each family income group, such as those earning less than 20k or more than 100k, excluding missing values. We then draw a pie chart to visualize the distribution of test takers across these income groups, helping to illustrate how the number of test takers varies by family income.
+
 ```{r}
-# Get U.S. states map data
-states_map <- map_data("state")
+income_takers <- c(sum(income_data$Family.Income.Less.than.20k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.Between.20.40k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.Between.40.60k.Test.takers, na.rm = TRUE),                    sum(income_data$Family.Income.More.than.100k.Test.takers, na.rm = TRUE))  
+income_labels <- c("Less than 20k", "Between 20-40k", "Between 40-60k", "More than 100k")  
+total_takers <- sum(income_takers)
 
-# Convert state codes to lowercase for matching
-state_test_takers$region <- tolower(state.name[match(state_test_takers$State.Code, state.abb)])
+# Calculate the percentage for each income group
+income_percentages <- round(income_takers / total_takers * 100, 1)
 
-# Merge test takers data with the map data, making sure to keep 'group' column from states_map
-map_data_merged <- left_join(states_map, state_test_takers, by = "region")
+# Create labels that include both income group and percentage
+income_labels <- paste(income_labels, income_percentages, "%")
 
-# Fill missing total_takers with 0 (or another value)
-map_data_merged$total_takers[is.na(map_data_merged$total_takers)] <- 0
-
-# Calculate centroids (average latitude and longitude) for each state
-state_centroids <- map_data_merged %>%
-  group_by(region) %>%
-  summarise(long = mean(long), lat = mean(lat))
-
-# Add the state abbreviations (State.Code) to the centroids data
-state_centroids$State.Code <- state_test_takers$State.Code[match(state_centroids$region, state_test_takers$region)]
+# Create the pie chart with percentages
+pie(income_takers, labels = income_labels, 
+    main = "Test Takers by Family Income Group")
 ```
 
-Finally, we put the data on map. 
-```{r}
-# Plot the map with state abbreviations
-ggplot() +
-  geom_polygon(data = map_data_merged, aes(x = long, y = lat, group = group, fill = total_takers), color = "black") +
-  geom_text(data = state_centroids, aes(x = long, y = lat, label = State.Code), size = 3, color = "white") +
-  scale_fill_continuous(name = "Total Test Takers", low = "lightblue", high = "darkblue", na.value = "grey50") +
-  theme_minimal() +
-  labs(title = "Total Test Takers by State") +
-  theme(legend.position = "bottom")
+The pie chart shows that the distribution of test takers across income groups is fairly balanced, but the "More than 100k" group occupies the largest portion. 
 
-```
-
-This map visualizes the total number of test takers by state, with a color scale indicating participation levels. Lighter shades of blue represent fewer test takers, while darker shades signify higher numbers. It shows that states like California and Texas are shown in darker blue, indicating a higher number of test takers, whereas less populous states such as Wyoming and Vermont appear in lighter blue, reflecting lower participation. The map reveals regional disparities, with higher test-taker concentrations in populous areas, particularly in the South and along the West Coast, while rural states tend to have fewer test takers. One concern of this map is that it misses two states, Alaska and Hawaii, which makes the visualization a little bit incomplete. 
-
+- We first extracts math scores for different family income groups, creating a new dataset called income_math_data. And we use a boxplot to visualize the distribution of math scores by income bracket, with each group assigned a different color. 
 
 ```{r}
-score_trend_long <- score_subset %>%
-  group_by(Year) %>%
-  summarise(Total.Math.Mean = mean(Total.Math, na.rm = TRUE),
-            Total.Verbal.Mean = mean(Total.Verbal, na.rm = TRUE)) %>%
-  pivot_longer(cols = c(Total.Math.Mean, Total.Verbal.Mean),
-               names_to = "Test_Type",
-               values_to = "Mean_Scores")
+income_data_long <- income_data %>%
+  select(Family.Income.Less.than.20k.Math, Family.Income.Between.20.40k.Math, 
+         Family.Income.Between.40.60k.Math, Family.Income.More.than.100k.Math,
+         Family.Income.Less.than.20k.Verbal, Family.Income.Between.20.40k.Verbal, 
+         Family.Income.Between.40.60k.Verbal, Family.Income.More.than.100k.Verbal) %>%
+  pivot_longer(cols = everything(),
+               names_to = c("Income_Bracket", "Score_Type"),
+               names_pattern = "Family.Income.(.*)\\.(.*)",
+               values_to = "Scores") %>%
+  mutate(Income_Bracket = case_when(
+    Income_Bracket == "Less.than.20k" ~ "<20k",
+    Income_Bracket == "Between.20.40k" ~ "20-40k",
+    Income_Bracket == "Between.40.60k" ~ "40-60k",
+    Income_Bracket == "More.than.100k" ~ ">100k"
+  )) %>%
+   mutate(Income_Bracket = factor(Income_Bracket, levels = c("<20k", "20-40k", "40-60k", ">100k")))
 
-# Plot the trend by year using ggplot2
-ggplot(score_trend_long, aes(x = Year, y = Mean_Scores, color = Test_Type)) +
-  geom_line(size = 1) +  # Create line plot
-  geom_point(size = 1) +   # Add points for emphasis
-  labs(title = "Trend of Average Math and Verbal Scores Over the Years",
-       x = "Year", y = "Average Scores",
-       color = "Test Type") +
-  theme_minimal() +
-  scale_color_manual(values = c("Total.Math.Mean" = "blue", 
-                                "Total.Verbal.Mean" = "red"))
-```
-
-
-```{r}
-testtaker_trend <- score_subset %>%
-  group_by(Year) %>%
-  summarise(Total.Test.Takers.Sum = sum(Total.Test.takers, na.rm = TRUE))
-
-# Plot the trend by year using ggplot2
-ggplot(testtaker_trend, aes(x = Year, y = Total.Test.Takers.Sum)) +
-  geom_line(size = 1, color = "blue") +  # Create line plot
-  geom_point(size = 1, color = "blue") +   # Add points for emphasis
-  labs(title = "Trend of Total Test Takers Over the Years",
-       x = "Year", y = "Total Test Takers") +
+# Create a boxplot for both Math and Verbal Scores by Family Income Bracket
+ggplot(income_data_long, aes(x = Income_Bracket, y = Scores, fill = Score_Type)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Math and Verbal Scores by Family Income Bracket",
+       x = "Family Income Bracket", y = "Scores") +
+  scale_fill_manual(values = c("Math" = "lightblue", "Verbal" = "lightcoral")) +
   theme_minimal()
+
 ```
 
-Limitation 1:
+The boxplot shows that the median math scores are similar across all income groups, with a slight increasing trend as income rises. However, the <20k income group has the widest range of scores, including several low outliers. The >100k group has more high-performing students, with fewer outliers at the low end. The middle-income groups, 20-40k and 40-60k, show less variability, with most scores tightly clustered. 
+
+
+### Theme 5: GPA-based Breakdown
+
+Our dataset provides a breakdown of test scores based on GPA ranges. Students are categorized into groups based on their GPA, ranging from A+ to D or lower. This allows for analysis of how students in different GPA ranges perform on standardized tests:
+
+GPA.A.Math
+GPA.B.Verbal
+111111111
+GPA.D.or.lower.Math
+
+```{r}
+gpa_data <- score_subset[, gpa_vars]
+head(gpa_data)
+```
+
+### Average Math & Verbal Scores vs. GPA Analysis
+
+- We calculated the mean math score for each GPA category and plotted it in a bar plot. This visualization shows how math scores are distributed across GPA categories, with each bar representing the average math score for a specific GPA range (from "A+" to "D or lower"). 
+
+```{r}
+gpa_data_long <- data.frame(
+  GPA = rep(c("A+", "A", "A-", "B", "C", "D or lower"), 2),
+  Score_Type = rep(c("Math", "Verbal"), each = 6),
+  Scores = c(
+    sapply(c("A.plus", "A", "A.minus", "B", "C", "D.or.lower"), 
+           function(grade) mean(gpa_data[[paste0("GPA.", grade, ".Math")]], na.rm = TRUE)),
+    sapply(c("A.plus", "A", "A.minus", "B", "C", "D.or.lower"), 
+           function(grade) mean(gpa_data[[paste0("GPA.", grade, ".Verbal")]], na.rm = TRUE))
+  )
+)
+gpa_data_long$GPA <- factor(gpa_data_long$GPA, levels = c("A+", "A", "A-", "B", "C", "D or lower"))
+
+ggplot(gpa_data_long, aes(x = GPA, y = Scores, fill = Score_Type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Average Math and Verbal Scores by GPA Category",
+       x = "GPA Category", y = "Scores") +
+  scale_fill_manual(values = c("Math" = "lightblue", "Verbal" = "lightcoral")) +
+  theme_minimal()
+
+```
+
+We can observe a decreasing trend in the plot, indicating an association between GPA and math scores. 
+The students with an "A+" GPA have the highest average math scores, while those in the "D or lower" category have the lowest. This suggests that students with higher GPAs tend to perform better in SAT math, and there's a consistent drop in math scores as GPA decreases. 
+
+- We calculated the mean verbal score for each GPA category and plotted it in a bar plot. This visualization shows how verbal scores are distributed across GPA categories, with each bar representing the average verbal score for a specific GPA range (from "A+" to "D or lower").
+
+From this figure, we can observe a decreasing trend in average verbal scores as GPA decreases, suggesting a positive correlation between GPA and verbal performance.  Students with an "A+" GPA have the highest average verbal scores, while those in the "D or lower" category have the lowest.  This indicates that students with higher GPAs tend to perform better in verbal assessments, and there is a consistent decline in scores as the GPA drops.、
+
+
+### Limitation 1:
 We conducted a thorough analysis of the data from 2005 to 2015. When calculating averages, we averaged the data across these years since the dataset is panel data. While this approach may overlook some detailed year-to-year changes and trends, we believe it offers valuable insights into broader patterns in education that could inform the next decade.
