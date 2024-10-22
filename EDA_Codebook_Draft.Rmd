@@ -90,7 +90,7 @@ In the dataset subseting section, we have catgetorized the 58 variables into fou
 The dataset contains basic demographic information that helps identify the year and the state in which the data was collected. These variables include:
 
 Year: The year the data was recorded.
-State.Code: Numeric or alphabetical codes assigned to states.
+State.Code: The two-letter abbreviation of the state.
 State.Name: The full names of the states.
 
 ```{r}
@@ -99,7 +99,7 @@ head(demographic_data)
 ```
 
 ### Map 
-Next, we want to use a map to visualize the total number of test takers by state because it highlights regional disparities in test participation, helping to identify areas with low engagement with education. This visualization shows unequal resource allocation and informing policies that can improve access to testing. By visualizing this data, we can better understand where educational interventions are most needed to promote equity across states.
+First of all, we want to use a map to visualize the total number of test takers by state because it highlights regional disparities in test participation, helping to identify areas with low engagement with education. This visualization shows unequal resource allocation and informing policies that can improve access to testing. By visualizing this data, we can better understand where educational interventions are most needed to promote equity across states.
 
 Firstly, we would load the dataset,ensure the summarized data is correct before proceeding with map-related steps.
 ```{r}
@@ -164,7 +164,7 @@ head(test_score_data)
 
 ### Total Scores Analysis
 
-- We plotted a histogram of total math and verbal scores to understand the distribution of scores across the sample. The histogram shows how frequently different score ranges occur.
+We plotted a histogram of total math and verbal scores to understand the distribution of scores across the sample. The histogram shows how frequently different score ranges occur.
 
 ```{r}
 par(mfrow = c(1, 2))
@@ -223,6 +223,7 @@ plot(test_score_data$Total.Math, test_score_data$Total.Verbal,
 
 The scatter plot shows a strong positive relationship between math and verbal scores. As math scores increase, verbal scores tend to increase as well, indicating that students who perform well in math also tend to score higher in verbal sections. 
 
+To better analyze, We plotted a line graph to find the trend of average math and verbal scores over the years. The graph shows the changes in average scores for each test type from 2005 to 2015, with a blue line representing math scores and a red line representing verbal scores.
 ```{r}
 score_trend_long <- score_subset %>%
   group_by(Year) %>%
@@ -243,8 +244,10 @@ ggplot(score_trend_long, aes(x = Year, y = Mean_Scores, color = Test_Type)) +
   scale_color_manual(values = c("Total.Math.Mean" = "blue", 
                                 "Total.Verbal.Mean" = "red"))
 ```
+From the line graph, we can observe that the average math scores were consistently higher than verbal scores throughout the period. Math scores showed a noticeable increase around 2010, followed by a decline, while verbal scores steadily decreased over the years. This suggests that students performed better in math compared to verbal, with the gap between the two subjects widening during certain years.
 
 
+We plotted another line graph to visualize the trend of total test takers over the years.The total number of test takers was calculated and summed for each year. The blue line represents the trend of total test takers over time, with points added to highlight the values for each year. The x-axis shows the year, while the y-axis represents the total number of test takers.
 ```{r}
 testtaker_trend <- score_subset %>%
   group_by(Year) %>%
@@ -258,10 +261,11 @@ ggplot(testtaker_trend, aes(x = Year, y = Total.Test.Takers.Sum)) +
        x = "Year", y = "Total Test Takers") +
   theme_minimal()
 ```
+From the line graph, we can observe that the total number of test takers generally increased between 2005 and 2015. There was a notable sharp rise around 2010, followed by a slight dip and stabilization after that period. This suggests that there was a significant growth in the number of students taking the test during that time, with the total number of test takers remaining relatively high after 2010, showing only slight fluctuations.
 
 ### Gender Group Analysis
 
-- We plotted a pie chart to represent the distribution of test takers by gender. The chart is divided into two segments, each showing the proportion of male and female participants in the test. 
+We plotted a pie chart to represent the distribution of test takers by gender. The chart is divided into two segments, each showing the proportion of male and female participants in the test. 
 
 ```{r}
 gender_takers <- c(sum(test_score_data$Gender.Female.Test.takers, na.rm = TRUE),
@@ -282,9 +286,7 @@ pie(gender_takers, labels = gender_labels,
     col = c("pink", "lightblue"))
 ```
 
-From the pie chart, we can observe that there are slightly more female test takers compared to male test takers. This difference need to be further analyzed, so we then plot another chart to analysis the score difference between "Female" and "Male".
-
-- We calculated the mean math and verbal scores for both females and males and plot in bar graph.
+From the pie chart, we can observe that there are slightly more female test takers compared to male test takers. This difference need to be further analyzed, so we then plot another chart to analysis the score difference between "Female" and "Male". We calculated the mean math and verbal scores for both females and males and plot in bar graph.
 
 ```{r}
 # Calculate average math and verbal scores by gender
@@ -483,7 +485,12 @@ The students with an "A+" GPA have the highest average math scores, while those 
 From this figure, we can observe a decreasing trend in average verbal scores as GPA decreases, suggesting a positive correlation between GPA and verbal performance.  Students with an "A+" GPA have the highest average verbal scores, while those in the "D or lower" category have the lowest.  This indicates that students with higher GPAs tend to perform better in verbal assessments, and there is a consistent decline in scores as the GPA drops.、
 
 
-# Limitation 1:
+# Limitation 1
 We conducted a thorough analysis of the data from 2005 to 2015. When calculating averages, we averaged the data across these years since the dataset is panel data. While this approach may overlook some detailed year-to-year changes and trends, we believe it offers valuable insights into broader patterns in education that could inform the next decade.
 
 # Further Discussion
+Our analysis opens several pathways for future research and raises important questions about ongoing disparities in the U.S. education system. One key area for further exploration is how demographic factors interact with test scores and academic performance. While our study highlights trends, such as higher average SAT scores in the Northeast, California, and Texas, what underlying factors contribute to the large disparity in scores? Is it due to economic differences, family education principles, or cultural values that prioritize higher education? Exploring these questions could provide insight into localized issues within the system.
+
+Moreover, the impact of socioeconomic status, as captured by the family income variables, suggests that future research could focus on income inequality and its long-term effects on educational outcomes. Are the patterns observed in this dataset consistent with more recent data? What advantages does higher income actually provide to students, such as access to more after-school programs, better family support, or greater parental involvement? Additionally, how might policy changes, such as increased funding for lower-income schools or the introduction of new educational technologies, influence these trends?
+
+Finally, since our data only covers 2005 to 2015, it would be valuable to compare it with more recent data, particularly from the COVID-19 period. What new patterns have emerged? Have disparities widened or narrowed? These are all important questions that future research could address.
