@@ -64,7 +64,7 @@ score_subset <- score %>%
 
 ```{r}
 # Check the structure of the new subset
-# str(score_subset)
+#str(score_subset)
 # head(score_subset)
 ```
 
@@ -72,18 +72,18 @@ score_subset <- score %>%
 #Summary Statistics of the dataset
 #summary(score_subset)
 ```
-
+The summary function provides basic information for each variable. However, since the dataset contains many variables, including the full summary in the final notebook would make it difficult to navigate. Therefore, we've commented out the summary to keep the notebook more readable. In our subsequent EDA, we provide a more detailed analysis of the variable distributions, ensuring that both machine and human audiences will still have a clear understanding of the data. This approach strikes a balance between readability and providing essential insights.
 
 ```{r}
 #save the new subset to a file
 write_csv(score_subset, "data/school_scores_subset.csv")
 ```
 
-By the code above, we reduced the variables from 99 to 58, leaving the ones we think are potentially insightful only. 
+By the code above, we reduced the variables from 99 to 53, leaving the ones we think are potentially insightful only. 
 
 # Breakdown & Analysis
 
-In the dataset subseting section, we have catgetorized the 58 variables into four themes. We would now explore the four themes separately. 
+In the dataset subseting section, we have catgetorized the 53 variables into four themes. We would now explore the four themes separately. 
 
 ## Theme 1: Demographic information
 
