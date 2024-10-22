@@ -64,7 +64,7 @@ score_subset <- score %>%
 
 ```{r,echo = FALSE}
 # Check the structure of the new subset
-str(score_subset)
+# str(score_subset)
 head(score_subset)
 ```
 
@@ -96,7 +96,7 @@ State.Name: The full names of the states.
 
 ```{r}
 demographic_data <- score_subset[, demographic_vars]
-print(demographic_data)
+head(demographic_data)
 ```
 
 ### Theme 2: Test Scores
@@ -109,7 +109,7 @@ Gender-based Test Scores: Gender.Female.Math, Gender.Male.Verbal
 
 ```{r}
 test_score_data <- score_subset[, test_score_vars]
-print(test_score_data)
+head(test_score_data)
 ```
 
 ### Theme 3: Academic Performance in Subjects
@@ -120,7 +120,7 @@ Our dataset also provides information on GPA and the number of years spent study
 
 ```{r}
 academic_data <- score_subset[, academic_vars]
-print(academic_data)
+head(academic_data)
 ```
 
 ### Theme 4. Family Income Groups
@@ -133,7 +133,7 @@ Family.Income.Less.than.20k.Test.takers
 
 ```{r}
 income_data <- score_subset[, income_vars]
-print(income_data)
+head(income_data)
 ```
 
 ### Theme 5: GPA-based Breakdown
@@ -147,7 +147,7 @@ GPA.D.or.lower.Math
 
 ```{r}
 gpa_data <- score_subset[, gpa_vars]
-print(gpa_data)
+head(gpa_data)
 ```
 
 
