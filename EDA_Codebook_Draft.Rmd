@@ -31,9 +31,9 @@ As college students, we chose this dataset because it addresses foundational iss
 score<-read.csv("data/school_scores.csv")
 ```
 
-```{r, echo = FALSE}
+```{r}
 #Inspect the dataset
-head(score)
+# head(score)
 ```
 
 ## Data Cleaning/Simplifying
@@ -62,10 +62,10 @@ score_subset <- score %>%
   select(all_of(selected_vars))
 ```
 
-```{r,echo = FALSE}
+```{r}
 # Check the structure of the new subset
 # str(score_subset)
-head(score_subset)
+# head(score_subset)
 ```
 
 ```{r,echo = FALSE}
