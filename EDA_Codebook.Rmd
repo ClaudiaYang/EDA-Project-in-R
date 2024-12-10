@@ -68,11 +68,17 @@ score_subset <- score %>%
 # head(score_subset)
 ```
 
+Explanation of not including the result of str() and head()
+In this analysis, while the str() and head() functions are implemented to ensure comprehensive data understanding and quality assurance, their outputs are not included directly in the initial sections of this document. This decision is made to prevent an overwhelming volume of preliminary data from cluttering the documentation, considering the dataset contains 53 variables. Including such detailed outputs from the outset could potentially expand the final report to an impractical length, estimated to exceed 300 pages.
+
+Overview of dataset:
+The dataset from the Common Core of Data (CCD) comprises 53 columns and spans records from 577 entries, representing U.S. public schools' performance data from 2005 to 2015. Key fields include Year, State.Code, State.Name, standardized test scores (Total.Math, Total.Verbal), and the number of test takers (Total.Test.takers). Additionally, it details performance across genders and various family income brackets. For instance, the first entry shows data for 2005 in Alaska with total math and verbal scores of 534 and 528, respectively, for 1,677 test takers. It breaks down further into gender-specific performance, with females scoring 538 in math and males 582, indicating nuanced disparities. Income-related performance is also segmented, illustrating how different income brackets correlate with test scores. This detailed breakdown allows for a nuanced analysis of demographics, academic achievement, and socioeconomic impacts on educational outcomes.
+
 ```{r,echo = FALSE}
 #Summary Statistics of the dataset
 #summary(score_subset)
 ```
-The summary function provides basic information for each variable. However, since the dataset contains many variables, including the full summary in the final notebook would make it difficult to navigate. Therefore, we've commented out the summary to keep the notebook more readable. In our subsequent EDA, we provide a more detailed analysis of the variable distributions, ensuring that both machine and human audiences will still have a clear understanding of the data. This approach strikes a balance between readability and providing essential insights.
+The summary function provides basic information for each variable. However, since the dataset contains many variables, including the full summary in the final notebook would make it difficult to navigate as mentioned above. Therefore, we've commented out the summary to keep the notebook more readable. In our subsequent EDA, we provide a more detailed analysis of the variable distributions, ensuring that both machine and human audiences will still have a clear understanding of the data. This approach strikes a balance between readability and providing essential insights.
 
 ```{r}
 #save the new subset to a file
