@@ -4,7 +4,7 @@
 
 ## Team Members and Affiliations
 Kevin Xie, Fay Yan, Claudia Yang, Karl Zhou<br>
-QTM 302W, Technical Writing , Emory University
+QTM 302W, Technical Writing, Emory University
 
 ## Objectives
 The primary objectives of this project are:
@@ -30,7 +30,7 @@ Regional Variations: Significant differences in SAT scores and GPAs were observe
 Socioeconomic Influence: Higher household incomes and parental education levels strongly correlate with improved SAT scores and GPAs.<br>
 Demographic Trends: Disparities exist across racial and ethnic groups, emphasizing systemic inequalities.<br>
 ### Future Directions
-Comparison of pre and post-COVID-19 data to assess the pandemic's impact on educational disparities.
+Comparison of pre and post-COVID-19 data to assess the pandemic's impact on educational disparities.<br>
 Exploration of policy interventions aimed at reducing disparities.
 
 ## How to Use the Repository
@@ -43,8 +43,8 @@ Required libraries for EDA (e.g., `ggplot2`, `dplyr`, `tidyr`, `summarytools`).<
 ### Instructions
 1. Clone this repository:
 ```bash
-git clone https://github.com/your-username/your-repository-name.git
-cd your-repository-name
+git clone https://github.com/ClaudiaYang/my_project_qtm302W.git
+cd my_project_qtm302W
 ```
 2. Open the `EDA_Codebook.Rmd` file in RStudio or render the `EDA_Codebook.html` file for a preview.
 3. To reproduce the results, execute the code blocks sequentially in RStudio.
