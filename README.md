@@ -43,8 +43,8 @@ Required libraries for EDA (e.g., `ggplot2`, `dplyr`, `tidyr`, `summarytools`).<
 ### Instructions
 1. Clone this repository:
 ```bash
-git clone https://github.com/your-username/your-repository-name.git
-cd your-repository-name
+git clone https://github.com/ClaudiaYang/my_project_qtm302W.git
+cd my_project_qtm302W
 ```
 2. Open the `EDA_Codebook.Rmd` file in RStudio or render the `EDA_Codebook.html` file for a preview.
 3. To reproduce the results, execute the code blocks sequentially in RStudio.
