@@ -1,5 +1,5 @@
 ---
-title: "EDA Code Notebook Draft"
+title: "EDA Code Notebook"
 author: "Group 5"
 date: "2024-10-03"
 output:
@@ -17,9 +17,10 @@ library(scales)
 ```
 
 # Introduction
+
 As college students studying social sciences, we are acutely aware of the multifaceted challenges within the educational system, such as disparities in access to quality education and the persistent achievement gaps across demographic groups. Our analysis leverages the Common Core of Data (CCD), maintained by the U.S. Department of Education, which catalogs comprehensive information on public elementary and secondary schools and districts across the United States from 2005 to 2015. This dataset not only aligns with our academic interests but also serves as a practical application of our data analysis skills to a field we are passionate about—education.
 
-The CCD includes a broad array of variables, totaling 99, ranging from graduation rates and standardized test scores to teacher qualifications and student-teacher ratios. While this wealth of data offers a broad lens to view the educational landscape, for our specific inquiry into educational inequalities, many of these variables are peripheral. Therefore, to deepen our analysis and maintain clarity in our investigation, we have chosen to focus on a subset of variables that directly relate to academic outcomes and socio-economic factors, such as demographics, test scores, academic achievements, and family income.
+The CCD includes a broad array of variables, totally 99, ranging from graduation rates and standardized test scores to teacher qualifications and student-teacher ratios. While this wealth of data offers a broad lens to view the educational landscape, for our specific inquiry into educational inequalities, many of these variables are peripheral. Therefore, to deepen our analysis and maintain clarity in our investigation, we have chosen to focus on a subset of variables that directly relate to academic outcomes and socio-economic factors, such as demographics, test scores, academic achievements, and family income.
 
 This targeted approach is not merely a methodological choice but a strategic one influenced by our position as students; it allows us to more effectively explore and interpret the complex relationships that drive educational outcomes. By narrowing our focus, we aim to provide a clearer, more detailed examination of how various factors impact student performance across different regions and demographic groups. This streamlined analysis is intended to identify leverage points for policy intervention and to generate insights that are both academically rigorous and socially relevant.
 
@@ -39,6 +40,7 @@ score<-read.csv("data/school_scores.csv")
 # Data Cleaning/Simplifying
 
 It is shown that there are 99 variables total in this dataset, which is too many for our analysis. Since our purpose of analysis is to investigate disparities and inequalities in educational outcomes across different regions and demographic groups, we decided to subset the dataset with the variables we think that are useful for our analysis. 
+
 ```{r}
 # Subset the dataset with relevant variables 
 demographic_vars <- c("Year", "State.Code", "State.Name")
@@ -68,16 +70,19 @@ score_subset <- score %>%
 # head(score_subset)
 ```
 
-Explanation of not including the result of str() and head()
+Explanation of not including the result of str() and head():
+
 In this analysis, while the str() and head() functions are implemented to ensure comprehensive data understanding and quality assurance, their outputs are not included directly in the initial sections of this document. This decision is made to prevent an overwhelming volume of preliminary data from cluttering the documentation, considering the dataset contains 53 variables. Including such detailed outputs from the outset could potentially expand the final report to an impractical length, estimated to exceed 300 pages.
 
 Overview of dataset:
+
 The dataset from the Common Core of Data (CCD) comprises 53 columns and spans records from 577 entries, representing U.S. public schools' performance data from 2005 to 2015. Key fields include Year, State.Code, State.Name, standardized test scores (Total.Math, Total.Verbal), and the number of test takers (Total.Test.takers). Additionally, it details performance across genders and various family income brackets. For instance, the first entry shows data for 2005 in Alaska with total math and verbal scores of 534 and 528, respectively, for 1,677 test takers. It breaks down further into gender-specific performance, with females scoring 538 in math and males 582, indicating nuanced disparities. Income-related performance is also segmented, illustrating how different income brackets correlate with test scores. This detailed breakdown allows for a nuanced analysis of demographics, academic achievement, and socioeconomic impacts on educational outcomes.
 
 ```{r,echo = FALSE}
 #Summary Statistics of the dataset
 #summary(score_subset)
 ```
+
 The summary function provides basic information for each variable. However, since the dataset contains many variables, including the full summary in the final notebook would make it difficult to navigate as mentioned above. Therefore, we've commented out the summary to keep the notebook more readable. In our subsequent EDA, we provide a more detailed analysis of the variable distributions, ensuring that both machine and human audiences will still have a clear understanding of the data. This approach strikes a balance between readability and providing essential insights.
 
 ```{r}
@@ -95,9 +100,9 @@ In the dataset subseting section, we have catgetorized the 53 variables into fou
 
 The dataset contains basic demographic information that helps identify the year and the state in which the data was collected. These variables include:
 
-Year: The year the data was recorded.
-State.Code: The two-letter abbreviation of the state.
-State.Name: The full names of the states.
+- Year: The year the data was recorded.
+- State.Code: The two-letter abbreviation of the state.
+- State.Name: The full names of the states.
 
 ```{r}
 demographic_data <- score_subset[, demographic_vars]
@@ -105,9 +110,11 @@ head(demographic_data)
 ```
 
 ### Map 
+
 First of all, we want to use a map to visualize the total number of test takers by state because it highlights regional disparities in test participation, helping to identify areas with low engagement with education. This visualization shows unequal resource allocation and informing policies that can improve access to testing. By visualizing this data, we can better understand where educational interventions are most needed to promote equity across states.
 
 Firstly, we would load the dataset,ensure the summarized data is correct before proceeding with map-related steps.
+
 ```{r}
 # Summarize the total test takers by state
 state_test_takers <- score_subset %>%
@@ -116,6 +123,7 @@ state_test_takers <- score_subset %>%
 ```
 
 Next, we would prepare the data ready to be put on a map by cleaning the dataset and merge by state names. 
+
 ```{r}
 # Get U.S. states map data
 states_map <- map_data("state")
@@ -139,6 +147,7 @@ state_centroids$State.Code <- state_test_takers$State.Code[match(state_centroids
 ```
 
 Finally, we put the data on map. 
+
 ```{r}
 # Plot the map with state abbreviations
 ggplot() +
@@ -157,7 +166,6 @@ This map visualizes the total number of test takers by state, with a color scale
 ## Theme 2: Test Scores
 
 Test scores represent one of the core components of our dataset. These variables include overall test scores, family income group test scores, and test scores based on GPA. Here are the variables:
-
 
 - Total.Test.takers: The number of test-takers in this state during this year
 - Gender.Female.Test,takers: The number of test-takers in this state during this year who identified as female
@@ -237,6 +245,7 @@ plot(test_score_data$Total.Math, test_score_data$Total.Verbal,
 The scatter plot shows a strong positive relationship between math and verbal scores. As math scores increase, verbal scores tend to increase as well, indicating that students who perform well in math also tend to score higher in verbal sections. 
 
 To better analyze, We plotted a line graph to find the trend of average math and verbal scores over the years. The graph shows the changes in average scores for each test type from 2005 to 2015, with a blue line representing math scores and a red line representing verbal scores.
+
 ```{r}
 score_trend_long <- score_subset %>%
   group_by(Year) %>%
@@ -257,10 +266,12 @@ ggplot(score_trend_long, aes(x = Year, y = Mean_Scores, color = Test_Type)) +
   scale_color_manual(values = c("Total.Math.Mean" = "blue", 
                                 "Total.Verbal.Mean" = "red"))
 ```
+
 From the line graph, we can observe that the average math scores were consistently higher than verbal scores throughout the period. Math scores showed a noticeable increase around 2010, followed by a decline, while verbal scores steadily decreased over the years. This suggests that students performed better in math compared to verbal, with the gap between the two subjects widening during certain years.
 
 
 We plotted another line graph to visualize the trend of total test takers over the years.The total number of test takers was calculated and summed for each year. The blue line represents the trend of total test takers over time, with points added to highlight the values for each year. The x-axis shows the year, while the y-axis represents the total number of test takers.
+
 ```{r}
 testtaker_trend <- score_subset %>%
   group_by(Year) %>%
@@ -274,6 +285,7 @@ ggplot(testtaker_trend, aes(x = Year, y = Total.Test.Takers.Sum)) +
        x = "Year", y = "Total Test Takers") +
   theme_minimal()
 ```
+
 From the line graph, we can observe that the total number of test takers generally increased between 2005 and 2015. There was a notable sharp rise around 2010, followed by a slight dip and stabilization after that period. This suggests that there was a significant growth in the number of students taking the test during that time, with the total number of test takers remaining relatively high after 2010, showing only slight fluctuations.
 
 ### Gender Group Analysis
@@ -349,7 +361,6 @@ Math Scores: The p-value is smaller than 0.05, indicating a statistically signif
 Verbal Scores:The p-value (0.01266) is also smaller than 0.05, indicating a statistically significant difference between verbal scores for females and males. However, the difference is much smaller compared to math scores, with males scoring about 6.5 points higher than females on average.
 
 
-
 ## Theme 3: Academic Performance in Subjects
 
 Our dataset also provides information on GPA and the number of years spent studying different subjects. The subjects include arts, English, foreign languages, mathematics, and natural sciences. Each subject has two variables:
@@ -384,10 +395,11 @@ plot(score_subset$Total.Verbal, score_subset$Academic.Subjects.English.Average.G
 
 par(mfrow = c(1, 1))
 ```
+
 From the plots, we can observe a positive relationship between SAT scores and GPA for both subjects. For math, higher SAT math scores are associated with higher mathematics GPAs, though the data appears more spread out. In contrast, the relationship between verbal scores and English GPA seems tighter, with a clearer upward trend, indicating a strong correlation between better verbal performance on the SAT and higher academic performance in English.
 
 
-## Theme 4. Family Income Groups
+## Theme 4: Family Income Groups
 
 Family income groups are crucial in understanding how socioeconomic factors influence student performance. Our dataset includes variables for different income brackets and their corresponding test scores:
 
@@ -502,10 +514,12 @@ We calculated the mean verbal score for each GPA category and plotted it in a ba
 From this figure, we can observe a decreasing trend in average verbal scores as GPA decreases, suggesting a positive correlation between GPA and verbal performance.  Students with an "A+" GPA have the highest average verbal scores, while those in the "D or lower" category have the lowest.  This indicates that students with higher GPAs tend to perform better in verbal assessments, and there is a consistent decline in scores as the GPA drops.、
 
 
-# Limitation 1
+# Limitation 
+
 We conducted a thorough analysis of the data from 2005 to 2015. When calculating averages, we averaged the data across these years since the dataset is panel data. While this approach may overlook some detailed year-to-year changes and trends, we believe it offers valuable insights into broader patterns in education that could inform the next decade.
 
 # Further Discussion
+
 Our analysis has revealed significant insights into the disparities in the U.S. education system, particularly around regional and demographic influences on SAT scores. Given our findings that students in the Northeast, California, and Texas consistently exhibit higher average scores, it is vital to delve into the underlying factors contributing to these disparities. Exploring whether these trends are due to economic differences, educational values within families, or cultural norms that emphasize higher education will help pinpoint localized issues and guide targeted interventions.
 
 Moreover, our results demonstrated a clear correlation between socioeconomic status and test performance. Families with higher incomes generally showed better outcomes with less variability in scores, suggesting that economic advantages translate into educational benefits. This link prompts further research into the specific resources and opportunities that higher income affords, such as access to quality after-school programs and enhanced parental involvement. Understanding these connections can inform policies aimed at leveling the educational playing field.
@@ -515,4 +529,5 @@ Additionally, the persistent performance gap highlighted by our decade-long data
 Lastly, the potential effects of policy changes, such as increased funding for lower-income schools or the adoption of new educational technologies, deserve close scrutiny. Given the regional and income-related disparities we've observed, assessing the impact of these policies can determine their efficacy in mitigating educational inequities.
 
 # Citation
+
 Cory Bart, A. (2016). School_scores (2.0.0) [Dataset]. https://corgis-edu.github.io/corgis/csv/school_scores/
